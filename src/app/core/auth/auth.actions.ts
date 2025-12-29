@@ -52,12 +52,12 @@ export class AuthenticateAction implements Action {
   payload: {
     email: string,
     password: string,
-   
+    usertype?: string
     // captchauuid: string
   };
 
-  constructor(email: string, password: string) {
-    this.payload = { email, password};
+  constructor(email: string, password: string, usertype?: string) {
+    this.payload = { email, password, usertype };
   }
 }
 

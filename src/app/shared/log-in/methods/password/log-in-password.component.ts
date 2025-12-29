@@ -132,6 +132,7 @@ export class LogInPasswordComponent implements OnInit, OnDestroy {
     this.form = this.formBuilder.group({
       email: ['', Validators.required],
       password: ['', Validators.required],
+      usertype: ['internal'],
       otp: ['']  
     });
     
@@ -197,6 +198,7 @@ export class LogInPasswordComponent implements OnInit, OnDestroy {
     // get email and password values
     const email: string = this.form.get('email').value;
     const password: string = this.form.get('password').value;
+    const usertype: string = this.form.get('usertype').value;
   
     // trim values
     email.trim();
@@ -214,7 +216,7 @@ export class LogInPasswordComponent implements OnInit, OnDestroy {
       this.authService.setRedirectUrlIfNotSet('/');
     }
     // dispatch AuthenticationAction
-    this.store.dispatch(new AuthenticateAction(email, password));
+    this.store.dispatch(new AuthenticateAction(email, password, usertype));
 
     // clear form
     this.form.reset();

@@ -70,7 +70,7 @@ export class AuthEffects {
   public authenticate$: Observable<Action> = createEffect(() => this.actions$.pipe(
     ofType(AuthActionTypes.AUTHENTICATE),
     switchMap((action: AuthenticateAction) => {
-      return this.authService.authenticate(action.payload.email, action.payload.password).pipe(
+      return this.authService.authenticate(action.payload.email, action.payload.password, undefined, action.payload.usertype).pipe(
         take(1),
         map((response: AuthStatus) => new AuthenticationSuccessAction(response.token)),
         catchError((error) => observableOf(new AuthenticationErrorAction(error)))

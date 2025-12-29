@@ -105,11 +105,19 @@ export class AuthService {
    *
    * @param {string} user The user name
    * @param {string} password The user's password
+   * @param {string} otp The OTP (optional)
+   * @param {string} usertype The user type (optional)
    * @returns {Observable<User>} The authenticated user observable.
    */
-  public authenticate(user: string, password: string, otp?:string): Observable<AuthStatus> {
+  public authenticate(user: string, password: string, otp?: string, usertype?: string): Observable<AuthStatus> {
     // Attempt authenticating the user using the supplied credentials.
-    const body = otp ? (`password=${encodeURIComponent(password)}&user=${encodeURIComponent(user)}&otp=${encodeURIComponent(otp)}`) : (`password=${encodeURIComponent(password)}&user=${encodeURIComponent(user)}`);
+    let body = `password=${encodeURIComponent(password)}&user=${encodeURIComponent(user)}`;
+    if (otp) {
+      body += `&otp=${encodeURIComponent(otp)}`;
+    }
+    if (usertype) {
+      body += `&usertype=${encodeURIComponent(usertype)}`;
+    }
     const options: HttpOptions = Object.create({});
     let headers = new HttpHeaders();
     headers = headers.append('Content-Type', 'application/x-www-form-urlencoded');
