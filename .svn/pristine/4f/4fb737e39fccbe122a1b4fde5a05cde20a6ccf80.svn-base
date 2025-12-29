@@ -1,0 +1,7 @@
+<div *ngIf="typeMessage">
+  <span class="badge badge-dark" style="    font-size: 94% !important;">{{ typeMessage | translate }}</span>
+  <span *ngIf="caseStatus" class="ml-1 badge " style="    font-size: 94% !important;" [ngClass]="classbager(caseStatus)">{{
+    caseStatus | translate }}</span>
+    
+  <span class="ml-1 badge badge-dark " *ngIf="dispodate !=''" style="    font-size: 94% !important;"> {{dispodate | translate }}</span>
+</div>

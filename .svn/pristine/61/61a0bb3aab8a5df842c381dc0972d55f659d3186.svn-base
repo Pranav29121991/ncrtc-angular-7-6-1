@@ -1,0 +1,63 @@
+<div class="row" style='width: 100%; height: 80vh'>
+  <div [ngClass]="{'col-12':!smartnote,'col-7':!!smartnote}">
+    <ng2-pdfjs-viewer [openFile]="true" [download]="false" [pdfSrc]="pdfSrc">
+    </ng2-pdfjs-viewer>
+  </div>
+  <div class="col-5" *ngIf="smartnote" style="border: 1px solid #80808038;
+    border-radius: 13px;
+    overflow: auto;">
+    <div class="row main-haeder-picker" id="mydivheader" style="align-items: center;">
+      <div class="left-band" *ngIf="isSkatchpad">
+        <button class="color-picker" [ngClass]="penColor === '#ff0000' ? 'selected-pen' : ''"
+          style="background-color: red;height: 15px;border-radius: 9px;" (click)="setPenColor('#ff0000')"
+          title="Ink color"></button>
+        <button class="color-picker" [ngClass]="penColor === '#0000ff' ? 'selected-pen' : ''"
+          style="background-color: blue;height: 15px;border-radius: 9px; margin-left: 5px;margin-right: 5px;"
+          (click)="setPenColor('#0000ff')" title="Ink color"></button>
+        <button class="color-picker" [ngClass]="penColor === '#000000' ? 'selected-pen' : ''"
+          style="background-color: black;height: 15px;border-radius: 9px;" (click)="setPenColor('#000000')"
+          title="Ink color"></button>
+        <button class="btn eraser-btn" [ngClass]="penColor === '#ffffff' ? 'selected-pen' : ''" (click)="setPenColor('#ffffff')"
+          title="Eraser"><i class="fa-solid fa-eraser" style="font-size: 25px;"></i></button>
+      </div>
+      <div class="right-band">
+        <div class="chekbox-band">
+          <label>Sketchpad</label>
+          <input type="checkbox" data-toggle="switchbutton" [formControl]="sketchpadCheckBox"
+            (change)="sketchpadChangeEvent($event,content2)" checked data-onstyle="primary">
+        </div>
+        <button id="save-button" class="btn" (click)="genratesmartnote()" title="Close"><i
+            class="fa-solid fa-xmark"></i></button>
+      </div>
+    </div>
+    <div class="canvas">
+      <ds-canvas-manager class="canvses" *ngIf="!!isSkatchpad" [noteInfo]="noteinfo" [penColor]="penColor" [usePen]="usePen"
+      [eraserMode]="isEraser" [generalNote]="false"></ds-canvas-manager>
+    </div>
+    <angular-editor *ngIf="!isSkatchpad" [formControl]="noteText" (input)="noteTextInput($event)"></angular-editor>
+  </div>
+</div>
+
+<ng-template #content2 let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title text-danger">Warning</h4>
+    <button type="button" id="delete_close" class="close" aria-label="Close" (click)="d('cancel')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>If you change note style it will delete previously added data. Do you want to continue?</p>
+  </div>
+  <div class="modal-footer">
+    <div class="btn-group mb-1">
+      <ul>
+        <li class="button" (click)="c('cancel')">
+          <a>{{'submission.general.discard.confirm.cancel' | translate}}</a>
+        </li>
+        <li class="red-bg button btn-danger" (click)="c('ok')">
+          <a>{{'submission.general.discard.confirm.submit' | translate}}</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</ng-template>

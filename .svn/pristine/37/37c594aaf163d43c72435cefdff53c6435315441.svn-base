@@ -1,0 +1,1909 @@
+import { Inject, AfterViewChecked, AfterContentInit, AfterViewInit, Component, OnInit, ViewChild, Input, ChangeDetectorRef, PLATFORM_ID, ElementRef, QueryList, ViewChildren } from '@angular/core';
+import { filter, map, switchMap, take, tap, catchError, } from 'rxjs/operators';
+import { DOCUMENT, isPlatformBrowser } from '@angular/common';
+import { trigger, transition, animate, style } from "@angular/animations";
+import { ActivatedRoute, Router, NavigationExtras } from '@angular/router';
+import { hasValue, isNotEmpty } from '../empty.util';
+import { toDSpaceObjectListRD, getFirstCompletedRemoteData, getFirstSucceededRemoteData, getRemoteDataPayload } from '../../core/shared/operators';
+import { Bitstream } from '../../core/shared/bitstream.model';
+import { BehaviorSubject, combineLatest as observableCombineLatest, Observable, of as observableOf, combineLatest } from 'rxjs';
+import { RemoteData } from '../../core/data/remote-data';
+import { Item } from 'src/app/core/shared/item.model';
+import { MetadataMap } from 'src/app/core/shared/metadata.models';
+import { ITreeOptions, TreeComponent } from '@circlon/angular-tree-component';
+import { followLink } from 'src/app/shared/utils/follow-link-config.model';
+import { BitstreamDataService } from '../../core/data/bitstream-data.service';
+import { PaginatedList } from '../../core/data/paginated-list.model';
+import { NotificationsService } from '../../shared/notifications/notifications.service';
+import { TranslateService } from '@ngx-translate/core';
+import { DocumenttypeTreeService } from '../../core/data/documenttypetree.service';
+import { DocumentTypeTree } from '../../core/shared/documenttypetree.model';
+import { NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { ConfirmationModalComponent } from '../../shared/confirmation-modal/confirmation-modal.component';
+import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NoContent } from '../../core/shared/NoContent.model';
+import { AuthorizationDataService } from '../../core/data/feature-authorization/authorization-data.service';
+import { AuthService } from 'src/app/core/auth/auth.service';
+import { FeatureID } from '../../core/data/feature-authorization/feature-id';
+import { URLCombiner } from '../../core/url-combiner/url-combiner';
+import * as moment from 'moment';
+import { DatePipe } from '@angular/common';
+import * as _ from 'lodash';
+import * as readFileAnnotations from '../../../assets/pdfjs/annotation/annotation.js'
+import { RightClickDirective } from '../right-click.directive';
+import p5 from 'p5';
+import { CdkDrag } from '@angular/cdk/drag-drop';
+import { json } from 'express';
+import { FormControl } from '@angular/forms';
+import { ItemDataService } from 'src/app/core/data/item-data.service';
+import { ITEM_PAGE_LINKS_TO_FOLLOW } from 'src/app/item-page/item.resolver';
+import { PaginationService } from 'src/app/core/pagination/pagination.service';
+import { PaginationComponentOptions } from '../pagination/pagination-component-options.model';
+import { APP_CONFIG, AppConfig } from 'src/config/app-config.interface';
+import { DSONameService } from 'src/app/core/breadcrumbs/dso-name.service';
+import { tr } from 'date-fns/locale';
+
+@Component({
+  selector: 'ds-display-bitstream',
+  templateUrl: './display-bitstream.component.html',
+  styleUrls: ['./display-bitstream.component.scss'],
+  animations: [
+    trigger("slideInOut", [
+      transition(":enter", [
+        style({ transform: "translateX(-100%)" }),
+        animate("200ms ease-in", style({ transform: "translateX(0%)" })),
+      ]),
+    ]),
+    trigger("slideOutIn", [
+      transition(":enter", [
+        style({ transform: "translateX(100%)" }),
+        animate("200ms ease-in", style({ transform: "translateX(0)" })),
+      ]),
+    ]),
+  ],
+})
+export class DisplayBitstreamComponent implements OnInit, AfterViewChecked, AfterContentInit, AfterViewInit {
+  @ViewChildren("checkboxes") checkboxes: QueryList<ElementRef>;
+  @ViewChild('nav2', { static: true }) public nav2;
+  @ViewChild('nav3', { static: true }) public nav3;
+  @Input() pageRoute: string;
+  @Input() id: string;
+  @Input() query: string;
+  leftOpen = true;
+  fullleft = false;
+  fullright = false;
+  openPDFATFrstTime = true;
+  objbitstream: Bitstream = null;
+  link: String = ""
+  active = 2;
+  active2: any;
+  active3: any;
+  active4: any;
+  thirdviewer: boolean = false;
+  secondviewer: boolean = false;
+  firstviewer: boolean = true;
+  showtree: boolean = false;
+  smarview: boolean = false;
+  smartBistream: Bitstream = null;
+  bitstreamList: any[] = [];
+  bitstreamListsecond: any = [];
+  bitstreamListthird: any = [];
+  bitstream$: Observable<Bitstream>;
+  itemRD$: BehaviorSubject<RemoteData<Item>>;
+  @Input() itemTab: Item;
+  private modalRef: NgbModalRef;
+  public editNode: any;
+  public nodeItems: any = [];
+  datedoc: string = "";
+  docdesc: string = "";
+  public lodder: boolean = false;
+  public pagelodder: boolean = false;
+  noteinfo: string = '';
+  noteList: any = [];
+  serachpageno: number;
+  public noteText = new FormControl();
+  treeOptions: ITreeOptions = {
+    useCheckbox: false,
+    allowDragoverStyling: true,
+    levelPadding: 20,
+    useVirtualScroll: false,
+    animateExpand: true,
+    animateSpeed: 30,
+    animateAcceleration: 1.2,
+    nodeHeight: 30,
+    dropSlotHeight: 3,
+  };
+  /**
+   * The ID of the item the bitstream originates from
+   * Taken from the current query parameters when present
+   * This will determine the route of the item edit page to return to
+   */
+  PDFStaticPath: string = "pdfviewer?file=";
+  itemId: string;
+  bitstreamRD$: RemoteData<PaginatedList<Bitstream>>;
+  metadata$: Observable<MetadataMap>;
+  loder: boolean = true;
+  loadfirsttime = true;
+  urlSafe: SafeResourceUrl;
+  id1: string;
+  id2: string;
+  @ViewChild('tree') tree: TreeComponent;
+  @ViewChild('myIframe', { static: false }) iframe: ElementRef;
+  smartnote: boolean = false;
+  isSkatchpad: boolean = true;
+  sketchpadCheckBox = new FormControl(true);
+  usePen: boolean = true;
+  private offsetX: number;
+  private offsetY: number;
+  private isDown = false;
+  annotaion_ID: string;
+  public isSiteAdmin: any = false;
+  generalNote: boolean = false;
+  licenseOptions = Object.assign(new PaginationComponentOptions(), {
+    id: 'lbo',
+    currentPage: 1,
+    pageSize: this.appConfig.item.bitstream.pageSize
+  });
+  originalOptions = Object.assign(new PaginationComponentOptions(), {
+    id: 'obo',
+    currentPage: 1,
+    pageSize: this.appConfig.item.bitstream.pageSize
+  });
+  constructor(
+    private itemDataService: ItemDataService,
+    @Inject(PLATFORM_ID) private platformId: any,
+    private route: ActivatedRoute,
+    private datePipe: DatePipe,
+    protected router: Router,
+    public sanitizer: DomSanitizer,
+    protected bitstreamDataService: BitstreamDataService,
+    protected notificationsService: NotificationsService,
+    protected translateService: TranslateService,
+    private documenttypeTreeService: DocumenttypeTreeService,
+    private cdRef: ChangeDetectorRef,
+    private modalService: NgbModal,
+    private authService: AuthService,
+    private authorizationService: AuthorizationDataService,
+    private elementRef: ElementRef,
+    private rightClickDirective: RightClickDirective,
+    protected paginationService: PaginationService,
+    public dsoNameService: DSONameService,
+    @Inject(APP_CONFIG) protected appConfig: AppConfig
+  ) { }
+
+  ngAfterViewChecked() {
+    //   this.viewSmartPDF(false);
+    //   this.getRootDocument();
+
+  }
+
+  ngAfterContentInit() {
+  }
+
+  @ViewChildren('resizableDiv') resizableDivs!: QueryList<ElementRef<HTMLDivElement>>;
+  updateDivWidths() {
+
+    const visibleDivs = this.resizableDivs.toArray().filter(div => div.nativeElement.style.display !== 'none');
+
+    if (visibleDivs.length === 1) {
+      visibleDivs[0].nativeElement.style.width = '100%';
+      visibleDivs[0].nativeElement.style.flex = '1 1 auto'; // Ensure it expands to fill the container
+    } else if (visibleDivs.length === 2) {
+      visibleDivs[0].nativeElement.style.width = '50%';
+      visibleDivs[0].nativeElement.style.flex = '1 1 auto'; // Ensure it expands to fill the container
+      visibleDivs[1].nativeElement.style.width = '50%';
+      visibleDivs[1].nativeElement.style.flex = '1 1 auto'; // Ensure it expands to fill the container
+    } else if (visibleDivs.length === 3) {
+      visibleDivs[0].nativeElement.style.width = '33%';
+      visibleDivs[0].nativeElement.style.flex = '1 1 auto'; // Ensure it expands to fill the container
+      visibleDivs[1].nativeElement.style.width = '33%';
+      visibleDivs[1].nativeElement.style.flex = '1 1 auto'; // Ensure it expands to fill the container
+      visibleDivs[2].nativeElement.style.width = '33%';
+      visibleDivs[2].nativeElement.style.flex = '1 1 auto'; // Ensure it expands to fill the container
+    } else {
+      visibleDivs.forEach(div => {
+        div.nativeElement.style.width = '25%';
+        div.nativeElement.style.flex = 'none';
+      });
+    }
+  }
+  ngAfterViewInit() {
+    this.updateDivWidths();
+    this.resizableDivs.forEach((divRef, index) => {
+      const resizer = divRef.nativeElement.querySelector('.resizer') as HTMLElement;
+      if (resizer) {
+        this.initResize(divRef.nativeElement, resizer, index);
+      }
+    });
+    const isAdmin$ = combineLatest([
+      this.authorizationService.isAuthorized(FeatureID.IsCollectionAdmin),
+      this.authorizationService.isAuthorized(FeatureID.IsCommunityAdmin),
+      this.authorizationService.isAuthorized(FeatureID.AdministratorOf),
+    ]).pipe(
+      map(([isCollectionAdmin, isCommunityAdmin, isSiteAdmin]) => {
+        return isSiteAdmin;
+
+      }),
+      take(1),
+    );
+    if (this.iframe) {
+      this.iframe.nativeElement.onload = () => {
+        // Access the iframe's contentDocument
+        const iframeDocument = this.iframe.nativeElement.contentDocument;
+
+        // Apply the right-click directive to elements within the iframe
+        if (iframeDocument) {
+          const elementsInIframe = iframeDocument.querySelectorAll('.iframe-content');
+          elementsInIframe.forEach((element) => {
+            this.rightClickDirective.onRightClick(element);
+          });
+        }
+      };
+    }
+    let firstLoad = true;
+    isAdmin$.pipe().subscribe((data) => {
+      // console.log("...............", data)
+      this.isSiteAdmin = data;
+      // console.log("........this.isSiteAdmin.......", this.isSiteAdmin)
+    })
+    if (isPlatformBrowser(this.platformId)) {
+
+      this.viewSmartPDF(false);
+      // this.getRootDocument();
+    }
+
+    //  this.viewSmartPDF(false);
+    //  this.getRootDocument();
+    window.addEventListener('storage', () => {
+      if (firstLoad) {
+        firstLoad = false;
+        return;
+      }
+
+      if (this.bitstreamList.length > 0) {
+        const uuid = this.bitstreamList[0].bitstream.id;
+        this.saveAnnotation(uuid);
+      }
+      if (this.bitstreamListsecond.length > 0) {
+        const uuid = this.bitstreamListsecond[0].bitstream.id;
+        this.saveAnnotation(uuid);
+      }
+      if (this.objbitstream !== null) {
+        const uuid = this.objbitstream.id;
+        this.saveAnnotation(uuid);
+      }
+
+
+
+      if (!!this.active3) {
+        const searchString = this.active3; // Replace 'your_substring' with the substring you want to search for.
+        var value1: string;
+        var id: string = null;
+        // Loop through all the keys in localStorage
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          // Check if the value includes the desired substring
+          if (key.includes(searchString)) {
+            if (key.includes('myAnnotation')) {
+              if (localStorage.getItem(key)) {
+                value1 = localStorage.getItem(key);
+              }
+            }
+            if (key.includes('sid2')) {
+              if (localStorage.getItem(key)) {
+                id = localStorage.getItem(key);
+              }
+            }
+          }
+        }
+        if (!id && !!this.id2) {
+          id = this.id2;
+        }
+        const data2 = {
+          bitstreamRest: {
+            uuid: this.active3
+          },
+          pdfannotationStr: value1,
+          uuid: id
+
+        }
+        if (!!value1) {
+          this.documenttypeTreeService.saveAnnotation(data2).pipe(
+            getFirstCompletedRemoteData(),
+            take(1)
+          ).subscribe((response: RemoteData<DocumentTypeTree>) => {
+            if (response.isSuccess) {
+              // this.notificationsService.success("Annotation Saved", { name: "" });
+              if (!id) {
+                this.id2 = response.payload !== null ? response.payload.id : null;
+              }
+              this.lodder = false;
+              this.cdRef.detectChanges();
+            } else {
+              // this.notificationsService.error("Cannot Save Annotation", { name: "" });
+              this.lodder = false;
+              this.cdRef.detectChanges();
+            }
+          });
+        }
+      }
+      // setCurrentTheme(theme);
+    });
+  }
+
+  private initResize(divElement: HTMLElement, resizerElement: HTMLElement, index: number): void {
+    const onMouseDown = (e: MouseEvent | TouchEvent) => {
+      e.preventDefault();
+
+      const startX = e instanceof MouseEvent ? e.pageX : e.touches[0].pageX;
+      const startWidth = divElement.getBoundingClientRect().width;
+
+      const containerElement = divElement.closest('.resizable-container') as HTMLElement;
+      const containerWidth = containerElement.getBoundingClientRect().width;
+
+      const minWidth = 50;
+
+      let nextDiv: HTMLElement | null = null;
+      let nextDivStartWidth = 0;
+
+      if (index < this.resizableDivs.length - 1) {
+        nextDiv = this.resizableDivs.toArray()[index + 1].nativeElement;
+        nextDivStartWidth = nextDiv.getBoundingClientRect().width;
+      }
+
+      const moveHandler = (e: MouseEvent | TouchEvent) => {
+        const dx = (e instanceof MouseEvent ? e.pageX : e.touches[0].pageX) - startX;
+
+        let newWidth = startWidth + dx;
+        newWidth = Math.max(newWidth, minWidth);
+
+        if (nextDiv) {
+          let nextDivNewWidth = nextDivStartWidth - dx;
+          nextDivNewWidth = Math.max(nextDivNewWidth, minWidth);
+
+          const totalWidth = newWidth + nextDivNewWidth;
+
+          if (totalWidth <= containerWidth) {
+            divElement.style.width = newWidth + 'px';
+            nextDiv.style.width = nextDivNewWidth + 'px';
+          } else {
+            const excess = totalWidth - containerWidth;
+            divElement.style.width = (newWidth - excess) + 'px';
+            nextDiv.style.width = minWidth + 'px';
+          }
+        } else {
+          if (newWidth <= containerWidth - this.calculateSiblingsWidth(containerElement, divElement)) {
+            divElement.style.width = newWidth + 'px';
+          } else {
+            divElement.style.width = containerWidth - this.calculateSiblingsWidth(containerElement, divElement) + 'px';
+          }
+        }
+      };
+
+      const upHandler = () => {
+        window.removeEventListener('mousemove', moveHandler);
+        window.removeEventListener('mouseup', upHandler);
+        window.removeEventListener('touchmove', moveHandler);
+        window.removeEventListener('touchend', upHandler);
+      };
+
+      window.addEventListener('mousemove', moveHandler);
+      window.addEventListener('mouseup', upHandler);
+      window.addEventListener('touchmove', moveHandler);
+      window.addEventListener('touchend', upHandler);
+    };
+
+    resizerElement.addEventListener('mousedown', onMouseDown);
+    resizerElement.addEventListener('touchstart', onMouseDown);
+  }
+
+  private calculateSiblingsWidth(container: HTMLElement, currentDiv: HTMLElement): number {
+    return Array.from(container.children)
+      .filter(child => child !== currentDiv)
+      .reduce((total, child) => total + (child as HTMLElement).getBoundingClientRect().width, 0);
+  }
+
+  saveAnnotation(id: string) {
+    const searchString = id; // Replace 'your_substring' with the substring you want to search for.
+    var value: string;
+    var id: string = null;
+    // Loop through all the keys in localStorage
+    if (!id && !!this.id1) {
+      id = this.id1;
+    }
+
+    var uuidArray = [];
+    var uuid = "";
+    var uuidArrayNote = [];
+    // Iterate over localStorage keys
+    for (var i = 0; i < localStorage.length; i++) {
+      var key = localStorage.key(i);
+
+      // Check if the key contains the pattern 'bitstreams'
+      if (key.includes(searchString)) {
+        // Push the UUID into the array
+        if (key.includes("content_page_fabric")) {
+          const data = localStorage.getItem(key);
+          uuidArray.push(data);
+        }
+        if (key.includes("uuid")) {
+          const data2 = localStorage.getItem(key);
+          uuid = data2;
+        }
+        if (key.includes("?page-")) {
+          const substringRegex = /\?([^?]+)$/;
+          const match1 = key.match(substringRegex);
+          const data = localStorage.getItem(key);
+          const obj = {};
+          obj[match1[1]] = data;
+          uuidArrayNote.push(obj);
+        }
+      }
+    }
+    var data = {};
+    data = {
+      bitstreamRest: {
+        uuid: searchString
+      },
+      pdfannotationStr: JSON.stringify(uuidArray),
+      noteannotatiostr: JSON.stringify(uuidArrayNote),
+      uuid: uuid
+    };
+    this.documenttypeTreeService.saveAnnotation(data).pipe(
+      getFirstCompletedRemoteData(),
+      take(1)
+    ).subscribe((response: RemoteData<DocumentTypeTree>) => {
+      if (response.isSuccess) {
+        // this.notificationsService.success("Annotation Saved", { name: "" });
+        if (!id) {
+          this.id1 = response.payload !== null ? response.payload.id : null;
+        }
+        this.lodder = false;
+        this.cdRef.detectChanges();
+      } else {
+        // this.notificationsService.error("Cannot Save Annotation", { name: "" });
+        this.lodder = false;
+        this.cdRef.detectChanges();
+      }
+    });
+  }
+
+  canvas: any;
+  sw = 2;
+  c = [];
+  strokeColor = 0;
+  canvasCount = 1;
+  currentCanvasID: string;
+  itemid: string;
+  ngOnInit(): void {
+    // this.viewSmartPDF(false);
+    // this.getRootDocument();
+    // this.route.queryParams.subscribe((params) => {
+      debugger;
+      const fullUrl = this.router.url; 
+      this.itemId = fullUrl.split('/').pop() || '';
+      console.log(this.itemId)
+      if (hasValue(this.itemId)) {
+        // this.itemid = params.itemid;
+        const itemRD$ = this.itemDataService.findById(this.itemId,
+          true,
+          true, ...ITEM_PAGE_LINKS_TO_FOLLOW
+        ).pipe(
+          getFirstCompletedRemoteData(),
+        );
+        this.cdRef.detectChanges();
+        itemRD$.subscribe((itemRD) => {
+          debugger;
+          this.itemTab = itemRD.payload;
+          this.initialize();
+          this.cdRef.detectChanges();
+        });
+      }
+    // })
+  }
+  originals$: Observable<RemoteData<PaginatedList<Bitstream>>>;
+  licenses$: Observable<RemoteData<PaginatedList<Bitstream>>>;
+  initialize(): void {
+    this.originals$ = this.paginationService.getCurrentPagination(this.originalOptions.id, this.originalOptions).pipe(
+      switchMap((options: PaginationComponentOptions) => this.bitstreamDataService.findAllByItemAndBundleName(
+        this.itemTab ,
+        'ORIGINAL',
+        {elementsPerPage: options.pageSize, currentPage: options.currentPage},
+        true,
+        true,
+        followLink('format'),
+        followLink('thumbnail'),
+      )),
+      tap((rd: RemoteData<PaginatedList<Bitstream>>) => {
+          if (hasValue(rd.errorMessage)) {
+            this.notificationsService.error(this.translateService.get('file-section.error.header'), `${rd.statusCode} ${rd.errorMessage}`);
+          }
+        }
+      )
+    );
+    this.originals$.subscribe((data) => {
+      console.log(data);
+      if(data && data.payload) {
+        debugger;
+        this.showpdf(data.payload.page[0],data.payload.page[0].name);
+      }
+    })
+    this.licenses$ = this.paginationService.getCurrentPagination(this.licenseOptions.id, this.licenseOptions).pipe(
+      switchMap((options: PaginationComponentOptions) => this.bitstreamDataService.findAllByItemAndBundleName(
+        this.itemTab,
+        'LICENSE',
+        {elementsPerPage: options.pageSize, currentPage: options.currentPage},
+        true,
+        true,
+        followLink('format'),
+        followLink('thumbnail'),
+      )),
+      tap((rd: RemoteData<PaginatedList<Bitstream>>) => {
+          if (hasValue(rd.errorMessage)) {
+            this.notificationsService.error(this.translateService.get('file-section.error.header'), `${rd.statusCode} ${rd.errorMessage}`);
+          }
+        }
+      )
+    );
+
+  }
+
+
+  penColor: string = '#0000ff';
+  isEraser: boolean = false;
+  setPenColor(color: string) {
+    if (color === '#ffffff') {
+      this.isEraser = true;
+    } else {
+      this.isEraser = false;
+    }
+    this.penColor = color;
+  }
+
+  genratesmartnote() {
+
+    if (this.smartnote) {
+      this.smartnote = false;
+      if (this.isSkatchpad) {
+        // this.p5Instance.noCanvas();
+      }
+      return;
+    }
+
+    this.fullleft = false;
+    this.smartnote = true;
+    this.cdRef.detectChanges();
+    if (!!this.smartnote) {
+      // this.p5Instance = new p5;
+      this.retrieveCanvasData();
+      // this.createCanvas();
+    }
+  }
+  @ViewChild('canvasContainer') canvasContainer: ElementRef;
+
+  private p5Instance: p5;
+  canvasDataString: any = [];
+  retrieveCanvasData() {
+    this.isSkatchpad = true;
+    this.cdRef.detectChanges();
+    this.canvasCount = 0;
+    // this.p5Instance.noCanvas();
+    this.canvasDataString = this.parsedData(localStorage.getItem(this.noteinfo));
+    if (!!this.canvasDataString && this.canvasDataString !== null) {
+      if (this.canvasDataString !== null) {
+
+        for (const i of this.canvasDataString) {
+          const canvasKeys = Object.keys(i).filter(key => key.includes('canvas'));
+          if (canvasKeys && canvasKeys.length > 0) {
+            this.sketchpadCheckBox.setValue(true);
+            this.createP5Instance(i);
+          } else {
+            this.isSkatchpad = false;
+            this.cdRef.detectChanges();
+            this.sketchpadCheckBox.setValue(false);
+            this.noteText.patchValue(this.canvasDataString[0].text);
+            let data: any = [];
+            data.push({ text: this.noteText.value });
+            localStorage.setItem(this.noteinfo, JSON.stringify(data));
+          }
+        }
+      } else {
+        this.createP5Instance(this);
+      }
+    } else {
+      this.createP5Instance(this);
+    }
+  }
+
+  createP5Instance(data: any) {
+    if (typeof window !== 'undefined') {
+      import('p5').then((p5) => {
+        // this.p5Instance = new p5.default(this.sketch.bind(this, data), this.canvasContainer.nativeElement);
+      });
+    }
+  }
+
+  createCanvas(): void {
+    this.createP5Instance(this);
+  }
+
+  getDataByKeyPrefix(prefix: string, data) {
+    const key = Object.keys(data).find(k => k.startsWith(prefix));
+    return key ? data[key] : null;
+  }
+
+  getKeysByPrefix(prefix: string, data): string[] {
+    return Object.keys(data).filter(k => k.startsWith(prefix));
+  }
+
+  sketch(p: any, i: any) {
+    let canvasKey = this.getKeysByPrefix('canvas_', p);
+    canvasKey = JSON.parse(JSON.stringify(canvasKey));
+    let canvasKey2: any = [];
+    if (canvasKey.length === 0) {
+      canvasKey2.push(('canvas_' + (this.canvasCount + 1)).toString());
+    } else {
+      canvasKey2 = canvasKey;
+    }
+    this.canvasCount++;
+
+    let currentPath = [];
+    let paths = [];
+
+    i.setup = () => {
+      let canvas = i.createCanvas(510, 607).id('canvas_' + (this.canvasCount + 1));
+      canvas.style('border', '1px solid black');
+      canvas.parent(this.canvasContainer.nativeElement);
+      i.strokeWeight(0.5);
+      i.curveDetail(5);
+      i.smooth();
+      this.currentCanvasID = 'canvas_' + (this.canvasCount + 1);
+
+      let storedData = this.getDataByKeyPrefix('canvas_', p);
+      if (storedData) {
+        storedData.forEach(data => {
+          paths.push(data.path);
+        });
+        redrawPaths();
+      }
+    };
+
+    i.mousePressed = () => {
+      addPoint(i.mouseX, i.mouseY);
+      drawCurrentPath();
+    };
+
+    i.mouseDragged = () => {
+      addPoint(i.mouseX, i.mouseY);
+      drawCurrentPath();
+    };
+
+    i.mouseReleased = () => {
+      if (currentPath.length > 0) {
+        saveSketchData(this.penColor, this.isEraser, this.noteinfo, this.currentCanvasID, currentPath);
+        currentPath = [];
+      }
+    };
+
+    i.touchStarted = () => {
+      if (i.touches.length > 0) {
+        const touch = i.touches[0];
+        addPoint(touch.x, touch.y);
+        drawCurrentPath();
+      }
+    };
+
+    i.touchMoved = () => {
+      if (i.touches.length > 0) {
+        const touch = i.touches[0];
+        addPoint(touch.x, touch.y);
+        drawCurrentPath();
+      }
+      return false;
+    };
+
+    i.touchEnded = () => {
+      if (currentPath.length > 0) {
+        drawCurrentPath();
+        saveSketchData(this.penColor, this.isEraser, this.noteinfo, this.currentCanvasID, currentPath);
+        currentPath = [];
+      }
+    };
+
+    const addPoint = (x, y) => {
+      const point = {
+        x: x,
+        y: y,
+        color: this.isEraser ? '#ffffff' : this.penColor,
+        weight: this.isEraser ? 20 : 1
+      };
+      currentPath.push(point);
+    };
+
+    const saveSketchData = (color, isEraser, noteinfo, canvasKey, path) => {
+      let sketchData1: any = [];
+      if (this.canvasDataString !== null) {
+        sketchData1 = this.canvasDataString;
+      }
+      let existingIndex: any = -1;
+      if (sketchData1) {
+        existingIndex = sketchData1.findIndex(item => item.hasOwnProperty(canvasKey));
+      }
+
+      let pathData = {
+        path: path,
+        strokeColor: isEraser ? 'background' : color
+      };
+
+      if (existingIndex !== -1) {
+        sketchData1[existingIndex][canvasKey].push(pathData);
+      } else {
+        let dataObject = {};
+        dataObject[canvasKey] = [pathData];
+        sketchData1.push(dataObject);
+      }
+
+      this.canvasDataString = sketchData1;
+      if (this.isSkatchpad) {
+        localStorage.setItem(noteinfo, JSON.stringify(sketchData1));
+        this.saveNotes();
+      }
+    };
+
+    const drawCurrentPath = () => {
+      i.noFill();
+      i.beginShape();
+      currentPath.forEach(point => {
+        i.stroke(point.color);
+        i.strokeWeight(point.weight);
+        i.curveVertex(point.x, point.y);
+      });
+      i.endShape();
+    };
+
+    const redrawPaths = () => {
+      paths.forEach(path => {
+        i.noFill();
+        i.beginShape();
+        path.forEach(point => {
+          i.stroke(point.color);
+          i.strokeWeight(point.weight);
+          i.curveVertex(point.x, point.y);
+        });
+        i.endShape();
+      });
+    };
+  }
+  // sketch(p: any, i: any): void {
+  //   console.log('old');
+  //   let bg;
+  //   const canvasKey = this.getKeysByPrefix('canvas_', p);
+  //   i.setup = () => {
+  //     let canvas2 = i.createCanvas(510, 607);
+  //     canvas2.style('border', '1px solid black');
+  //     canvas2.parent(this.canvasContainer.nativeElement);
+  //     // s.background(bg);
+  //     i.strokeWeight(2); // Set a default stroke weight
+
+  //     let storedData = this.getDataByKeyPrefix('canvas_', p);
+  //     console.log(storedData);
+  //     if (storedData) {
+  //       // Restore previous drawing data if available
+  //       storedData.forEach(data => {
+  //         if (!!data.strokeColor && data.strokeColor === 'background') {
+  //           i.stroke(bg.get(data.x, data.y)); // Retrieve color from background image
+  //         } else {
+  //           i.stroke(data.strokeColor); // Use pen color
+  //         }
+  //         i.line(data.x, data.y, data.px, data.py);
+  //       });
+  //     }
+  //   };
+
+  //   i.draw = () => {
+  //     if (i.mouseIsPressed) {
+  //       if (i.mouseButton === i.LEFT) {
+  //         if (this.isEraser) {
+  //           i.stroke(bg.get(p.mouseX, p.mouseY)); // Use background color as eraser
+  //         } else {
+  //           i.stroke(this.penColor);
+  //         }
+  //         i.line(i.mouseX, i.mouseY, i.pmouseX, i.pmouseY);
+  //       } else if (i.mouseButton === i.CENTER) {
+  //         i.background(bg);
+  //       }
+  //       // Save sketch data to local storage
+  //       saveSketchData(this.penColor, this.isEraser, this.noteinfo, canvasKey); // Pass penColor as parameter
+  //     }
+  //   };
+
+  //   i.mouseReleased = () => {
+  //     // Reset stroke color on mouse release
+  //     i.stroke(this.penColor);
+  //   };
+
+  //   i.keyPressed = () => {
+  //     if (i.key === 'c') {
+  //       window.location.reload();
+  //     }
+  //   };
+
+  //   i.clearSketch = () => {
+  //     i.background(bg);
+  //     localStorage.removeItem(this.noteinfo);
+  //   };
+
+  //   const saveSketchData = (color, isEraser, noteinfo, canvasKey) => {
+  //     // Save drawing data to local storage
+  //     console.log(canvasKey);
+  //     let sketchData1 : any = []
+  //     sketchData1 = JSON.parse(localStorage.getItem(noteinfo)) || [];
+  //     console.log(sketchData1);
+  //     let existingIndex : any = -1;
+  //     if(sketchData1) {
+  //       existingIndex = sketchData1.findIndex(item => item.hasOwnProperty(canvasKey));
+  //     }
+  //     // Initialize sketchData to store the drawing data
+  //     if(i.mouseX && i.mouseY) {
+  //       let sketchData = {
+  //         x: i.mouseX,
+  //         y: i.mouseY,
+  //         px: i.pmouseX,
+  //         py: i.pmouseY,
+  //         strokeColor: isEraser ? 'background' : color
+  //       };
+
+  //       if (existingIndex !== -1) {
+  //         // Update the existing entry
+  //         sketchData1[existingIndex][canvasKey].push(sketchData);
+  //       } else {
+  //         // Create a new entry
+  //         let dataObject = {};
+  //         dataObject[canvasKey] = [sketchData];
+  //         sketchData1.push(dataObject);
+  //       }
+  //       console.log(sketchData1)
+  //       localStorage.setItem(noteinfo, JSON.stringify(sketchData1));
+  //       this.saveNotes();
+  //     }
+  //   };
+  //   //   // Add other event handlers as needed
+  // }
+
+  saveNotes() {
+    var note = localStorage.getItem(this.noteinfo);
+    const idRegex = /\/bitstreams\/([a-f0-9-]+)\/content/;
+
+    // Executing the regular expression on the URL
+    const match = this.noteinfo.match(idRegex);
+    var uuidArrayNote: any = [];
+    var uuid: string = '';
+    var uuidArray = [];
+    for (var i = 0; i < localStorage.length; i++) {
+      var key = localStorage.key(i);
+
+      // Check if the key contains the pattern 'bitstreams'
+      if (key.includes(match[1])) {
+        // Push the UUID into the array
+        if (key.includes("?page-")) {
+          const substringRegex = /\?([^?]+)$/;
+          const match1 = key.match(substringRegex);
+          const data = localStorage.getItem(key);
+          const obj = {};
+          obj[match1[1]] = data;
+          uuidArrayNote.push(obj);
+        }
+        if (key.includes("content_page_fabric")) {
+          const data = localStorage.getItem(key);
+          uuidArray.push(data);
+        }
+        if (key.includes("uuid")) {
+          const data2 = localStorage.getItem(key);
+          uuid = data2;
+        }
+      }
+
+    }
+    var data = {};
+    data = {
+      bitstreamRest: {
+        uuid: match[1]
+      },
+      pdfannotationStr: JSON.stringify(uuidArray),
+      noteannotatiostr: JSON.stringify(uuidArrayNote),
+      uuid: uuid
+    };
+    this.documenttypeTreeService.saveAnnotation(data).pipe(
+      getFirstCompletedRemoteData(),
+      take(1)
+    ).subscribe((response: RemoteData<DocumentTypeTree>) => {
+    });
+  }
+
+  clearskatchpad() {
+    debugger;
+    localStorage.removeItem('sketchData');
+    this.saveNotes();
+  }
+
+  public getRootDocument() {
+    debugger;
+    this.loder = true;
+    this.nodeItems = [];
+    this.documenttypeTreeService._getdocumentTreeByItem(this.itemTab.id).pipe(
+      getFirstCompletedRemoteData(),
+    ).subscribe((response: RemoteData<PaginatedList<DocumentTypeTree>>) => {
+
+      response.payload.page.map((documentypetree: DocumentTypeTree) => {
+        if (documentypetree.display) {
+          documentypetree.children.map((data: DocumentTypeTree) => {
+            if (data.bitstream != null) {
+              if (this.bitstreamList.length == 0) {
+                this.objbitstream = data.bitstream;
+              }
+            }
+          });
+          this.nodeItems.push(documentypetree)
+        }
+      });
+      this.loadpdfFirst(this.objbitstream);
+      this.showtree = true;
+      //console.log("this.nodeItemsthis.nodeItemsthis.nodeItems,", this.nodeItems)
+      this.loder = false;
+      //   this.tree.treeModel.update();
+      setTimeout(() => {
+        //  this.tree.treeModel.update();
+        this.cdRef.detectChanges();
+      }, 200);
+    });
+  }
+
+  loadpdfFirst(bistream) {
+    if (bistream !== null) {
+      this.bitstreamDataService.findById(bistream.id).pipe(getFirstSucceededRemoteData(),
+        getRemoteDataPayload(),
+      ).subscribe((response: Bitstream) => {
+        this.authService.getShortlivedToken().pipe(take(1), map((token) =>
+          hasValue(token) ? new URLCombiner(response._links.content.href, `?authentication-token=${token}`).toString() : response._links.content.href)).subscribe((logs: string) => {
+            this.objbitstream = response;
+            console.log(this.objbitstream);
+            // this.objbitstream._links.content.href = logs;
+            this.cdRef.detectChanges();
+
+            this.documenttypeTreeService.getAnnotationData(response.id).pipe(
+              catchError((error) => {
+                let data = {
+                  bitstreamRest: {
+                    uuid: bistream.id
+                  },
+                  pdfannotationStr: "",
+
+                };
+                this.documenttypeTreeService.saveAnnotation(data).pipe(
+                  getFirstCompletedRemoteData(),
+                  take(1)
+                ).subscribe((response1: RemoteData<DocumentTypeTree>) => {
+                  if (response1.isSuccess) {
+
+                    this.id1 = response1.payload !== null ? response1.payload.id : null;
+
+                    this.lodder = false;
+                    this.cdRef.detectChanges();
+                  } else {
+                    // this.notificationsService.error("Cannot Save Annotation", { name: "" });
+                    this.lodder = false;
+                    this.cdRef.detectChanges();
+                  }
+
+
+
+                });
+                return error;
+              })
+            ).subscribe((data) => {
+              if (!!data['pdfannotationStr'] && data['pdfannotationStr'] !== "{}") {
+                const det = this.parsedData(data['pdfannotationStr']);
+                for (const j of det) {
+                  const det2 = this.parsedData(j);
+                  const hasNumber = det2.page_id.match(/\d+/g);
+                  if (hasNumber[0]) {
+                    localStorage.setItem(response._links.content.href + '_page_fabric_' + hasNumber[0], JSON.stringify(det2));
+                  }
+                }
+                if (!!data['noteannotatiostr'] && data['noteannotatiostr'] !== "{}") {
+                  const notedata = this.parsedData(data['noteannotatiostr']);
+                  let i = 1;
+                  for (const obj of notedata) {
+                    for (const key in obj) {
+                      if (Object.hasOwnProperty.call(obj, key)) {
+                        this.noteList.push('Note' + i);
+                        let objkeydata = this.parsedData(obj[key]);
+                        localStorage.setItem(response._links.content.href + '?' + key, JSON.stringify(objkeydata));
+                      }
+                    }
+                  }
+                }
+              }
+              if (data['uuid']) {
+                localStorage.setItem(response._links.content.href + '/uuid', data['uuid']);
+                // readFileAnnotations.readFabricAnnotationsForPage();
+              }
+              this.cdRef.detectChanges();
+            });
+          });
+
+      })
+    }
+
+
+  }
+  loadPdf(node) {
+    debugger;
+    this.openPDFATFrstTime = false;
+    this.smarview = false;
+    this.firstviewer = true;
+    this.bitstreamDataService.findById(node.data.bitstream.id).pipe(getFirstSucceededRemoteData(),
+      getRemoteDataPayload(),
+    ).subscribe((response: any) => {
+      const result = this.bitstreamList.some(item => item.bitstream.id === response.id);
+
+      // let data1 = { id: response.id, href: response._links.content.href };
+
+      // let obj = { node: { ...node }, bitstream: data1 };
+      // this.bitstreamList.push(obj);
+
+      this.authService.getShortlivedToken().pipe(take(1), map((token) =>
+        hasValue(token) ? new URLCombiner(response._links.content.href, `?authentication-token=${token}`).toString() : response._links.content.href)).subscribe((logs: string) => {
+          let data = { id: response.id, href: response._links.content.href };
+          // data.href = encodeURIComponent(data.href);
+          debugger;
+          let obj = { node: { ...node }, bitstream: data };
+          if (!result) {
+            this.bitstreamList = [];
+            this.bitstreamList.push(obj);
+          }
+
+          this.cdRef.detectChanges();
+          this.documenttypeTreeService.getAnnotationData(response.id).pipe(
+            catchError((error) => {
+              let data = {
+                bitstreamRest: {
+                  uuid: this.bitstreamList[0].bitstream.id
+                },
+                pdfannotationStr: "",
+
+              };
+              this.documenttypeTreeService.saveAnnotation(data).pipe(
+                getFirstCompletedRemoteData(),
+                take(1)
+              ).subscribe((response1: RemoteData<DocumentTypeTree>) => {
+                this.cdRef.detectChanges();
+                if (response1.isSuccess) {
+
+                  this.id1 = response1.payload !== null ? response1.payload.id : null;
+
+                  this.lodder = false;
+                  this.cdRef.detectChanges();
+                } else {
+                  // this.notificationsService.error("Cannot Save Annotation", { name: "" });
+                  this.lodder = false;
+                  this.cdRef.detectChanges();
+                }
+
+                if (this.bitstreamList.length == 1) {
+                  this.active2 = this.bitstreamList[0].bitstream.id;
+                  // this.nav2.select(this.bitstreamList[0].bitstream.id)
+                } else {
+                  this.active2 = response.id;
+                  //this.nav2.select(response.id)
+                }
+                this.cdRef.detectChanges();
+              });
+              return error;
+            })
+          ).subscribe((data) => {
+            if (data != null) {
+              if (!!data['pdfannotationStr'] && data['pdfannotationStr'] !== "{}") {
+                const det = this.parsedData(data['pdfannotationStr']);
+                for (const j of det) {
+                  const det2 = this.parsedData(j);
+                  const hasNumber = det2.page_id.match(/\d+/g);
+                  if (hasNumber[0]) {
+                    localStorage.setItem(response._links.content.href + '_page_fabric_' + hasNumber[0], JSON.stringify(det2));
+                  }
+                }
+                if (!!data['noteannotatiostr'] && data['noteannotatiostr'] !== "{}") {
+                  const notedata = this.parsedData(data['noteannotatiostr']);
+                  let i = 0;
+                  for (const obj of notedata) {
+                    for (const key in obj) {
+                      if (Object.hasOwnProperty.call(obj, key)) {
+                        this.noteList.push('Note' + i);
+                        let objkeydata = this.parsedData(obj[key]);
+                        localStorage.setItem(response._links.content.href + '?' + key, JSON.stringify(objkeydata));
+                        i++;
+                      }
+                    }
+                  }
+                }
+              }
+              if (data['uuid']) {
+                localStorage.setItem(response._links.content.href + '/uuid', data['uuid']);
+                // readFileAnnotations.readFabricAnnotationsForPage();
+              }
+            }
+
+            if (this.bitstreamList.length == 1) {
+              this.active2 = this.bitstreamList[0].bitstream.id;
+              // this.nav2.select(this.bitstreamList[0].bitstream.id)
+            } else {
+              this.active2 = response.id;
+              //this.nav2.select(response.id)
+            }
+            this.cdRef.detectChanges();
+          });
+
+        });
+
+
+
+      // } else {
+      //   console.log('12');
+      //   this.bitstreamList = [];
+      //   // let data1 = { id: response.id, href: response._links.content.href };
+
+      //   // let obj = { node: { ...node }, bitstream: data1 };
+      //   // this.bitstreamList.push(obj);
+
+      //   this.authService.getShortlivedToken().pipe(take(1), map((token) =>
+      //     hasValue(token) ? new URLCombiner(response._links.content.href, `?authentication-token=${token}`).toString() : response._links.content.href)).subscribe((logs: string) => {
+      //       let data = { id: response.id, href: response._links.content.href };
+      //      // data.href = encodeURIComponent(data.href);
+      //       console.log(data)
+      //       let obj = { node: { ...node }, bitstream: data };
+      //       this.bitstreamList.push(obj)
+      //     });
+      // }
+
+
+
+    })
+
+  }
+
+  parsedData(data: any) {
+    while (typeof data !== 'object') {
+      try {
+        data = JSON.parse(data);
+      } catch (error) {
+        console.error('Parsing failed:', error);
+        break;
+      }
+    }
+    return data;
+  }
+
+  extractNumberFromString(inputString: string): number | null {
+    // Use a regular expression to find the first number in the string
+    const matches = inputString.match(/\d+/);
+
+    if (matches) {
+      // Convert the matched string to a number
+      const number = parseInt(matches[0], 10);
+
+      // Check if the conversion was successful
+      if (!isNaN(number)) {
+        return number;
+      }
+    }
+
+    // If no number is found, return null or handle the case as needed
+    return null;
+  }
+  // loadpdfFirst(bistream) {
+  //   this.bitstreamDataService.findById(bistream.id).pipe(getFirstSucceededRemoteData(),
+  //     getRemoteDataPayload(),
+  //   ).subscribe((response: Bitstream) => {
+  //     this.objbitstream = response;
+  //     this.cdRef.detectChanges();
+
+  //   })
+
+  // }
+  close(event: MouseEvent, toRemove: string, from: string = '') {
+    debugger;
+    this.firstviewer = false;
+    if (from !== 'fromdefault') {
+      this.bitstreamList = [];
+      this.cdRef.detectChanges();
+    }
+    this.cdRef.detectChanges()
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    this.updateDivWidths();
+    if (!this.fullright && this.fullleft && this.leftOpen) {
+      this.fullleftC();
+    }
+  }
+
+  getChildren(node): void {
+    var chid = node.data.children.slice();
+    Object.seal(node);
+    chid.sort((a, b) => (a.istemplet) ? 1 : -1);
+    console.log(chid)
+    node.data.children = chid.slice();
+    // Object.assign(node.data.children, chid)
+    // node.data.children=chid;
+    node.expand();
+    this.tree.treeModel.update();
+    //this.cdRef.detectChanges();
+  }
+
+  fullrightC() {
+    debugger;
+    if (!this.fullright) {
+      this.fullright = true;
+      this.fullleft = false;
+    } else {
+      this.fullright = false;
+      this.fullleft = false;
+    }
+
+  }
+  fullleftC() {
+    if (!this.fullleft) {
+      this.fullright = false;
+      this.fullleft = true;
+    } else {
+      this.fullright = false;
+      this.fullleft = false;
+    }
+    console.log(this.fullright, this.leftOpen)
+  }
+
+  private initResizers(): void {
+    this.resizableDivs.forEach((divRef, index) => {
+      const resizer = divRef.nativeElement.querySelector('.resizer') as HTMLElement;
+      if (resizer) {
+        this.initResize(divRef.nativeElement, resizer, index);
+      }
+    });
+  }
+
+  sencodview(node,name:string) {
+    console.log(node);
+    this.fullleftC();
+      this.secondviewer = true;
+      setTimeout(() => {
+        this.initResizers(); // Initialize resizers for newly added div
+      });
+      this.cdRef.detectChanges();
+      this.updateDivWidths();
+      this.bitstreamDataService.findById(node.id).pipe(getFirstSucceededRemoteData(),
+        getRemoteDataPayload(),
+      ).subscribe((response: any) => {
+        const result = this.bitstreamListsecond.some(item => item.bitstream.id === response.id);
+        if (!result) {
+          this.bitstreamListsecond = [];
+          this.authService.getShortlivedToken().pipe(take(1), map((token) =>
+            hasValue(token) ? new URLCombiner(response._links.content.href, `?authentication-token=${token}`).toString() : response._links.content.href)).subscribe((logs: string) => {
+              let data = { id: response.id, href: response._links.content.href };
+              let obj = { name:  name, bitstream: data, };
+              this.bitstreamListsecond.push(obj)
+
+              this.documenttypeTreeService.getAnnotationData(response.id).pipe(
+                catchError((error) => {
+                  let data = {
+                    bitstreamRest: {
+                      uuid: this.bitstreamListsecond[0].bitstream.id
+                    },
+                    pdfannotationStr: "",
+
+                  };
+                  this.documenttypeTreeService.saveAnnotation(data).pipe(
+                    getFirstCompletedRemoteData(),
+                    take(1)
+                  ).subscribe((response1: RemoteData<DocumentTypeTree>) => {
+                    this.cdRef.detectChanges();
+                    if (response1.isSuccess) {
+
+                      this.id1 = response1.payload !== null ? response1.payload.id : null;
+
+                      this.lodder = false;
+                      this.cdRef.detectChanges();
+                    } else {
+                      // this.notificationsService.error("Cannot Save Annotation", { name: "" });
+                      this.lodder = false;
+                      this.cdRef.detectChanges();
+                    }
+
+                    if (this.bitstreamListsecond.length == 1) {
+                      this.active3 = this.bitstreamListsecond[0].bitstream.id;
+                    } else {
+                      this.active3 = response.id;
+                    }
+                    this.cdRef.detectChanges();
+                  });
+                  return error;
+                })
+              ).subscribe((data) => {
+                if (data != null) {
+                  if (!!data['pdfannotationStr'] && data['pdfannotationStr'] !== "{}") {
+                    const det = this.parsedData(data['pdfannotationStr']);
+                    for (const j of det) {
+                      const det2 = this.parsedData(j);
+                      const hasNumber = det2.page_id.match(/\d+/g);
+                      if (hasNumber[0]) {
+                        localStorage.setItem(response._links.content.href + '_page_fabric_' + hasNumber[0], JSON.stringify(det2));
+                      }
+                    }
+                  }
+                  if (data['uuid']) {
+                    localStorage.setItem(response._links.content.href + '/uuid', data['uuid']);
+                  }
+                }
+
+                if (this.bitstreamListsecond.length == 1) {
+                  this.active3 = this.bitstreamListsecond[0].bitstream.id;
+                } else {
+                  this.active3 = response.id;
+                }
+                this.cdRef.detectChanges();
+              });
+
+            });
+        
+        }
+              })
+
+  }
+  closesecondview(event: MouseEvent, toRemove: string) {
+    this.bitstreamListsecond = [];
+    this.secondviewer = false;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if (!this.fullright && this.fullleft && this.leftOpen) {
+      this.fullleftC();
+    }
+
+    this.cdRef.detectChanges();
+  }
+  closethirdview(event: MouseEvent, toRemove: string) {
+    this.bitstreamListthird = [];
+    this.thirdviewer = false;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if (!this.fullright && this.fullleft && this.leftOpen) {
+      this.fullleftC();
+    }
+
+    this.cdRef.detectChanges();
+  }
+  editNOde(content, node) {
+    this.modalRef = this.modalService.open(content, { size: 'lg' });
+    this.editNode = node;
+    this.docdesc = node.data.desc;
+    this.datedoc = this.editNode.data.isDate ? this.datePipe.transform(node.data.doc_date, 'yyyy-MM-dd') : "";
+    this.datedoc = this.datePipe.transform(node.data.doc_date, 'yyyy-MM-dd');//moment(new Date(node.data.doc_date)).format("DD/MM/YYYY").toString(); ;
+    this.cdRef.detectChanges()
+  }
+  closePopup() {
+    this.modalRef.close();
+  }
+  updateNode() {
+    let documentTypeTree: DocumentTypeTree = new DocumentTypeTree();;
+    documentTypeTree.desc = this.docdesc;
+    documentTypeTree.id = this.editNode.data.id;
+    console.log(this.datedoc)
+    documentTypeTree.doc_date = this.datedoc == "" ? null : new Date(this.datedoc);
+    console.log("documentTypeTreedocumentTypeTreedocumentTypeTree", documentTypeTree);
+    this.documenttypeTreeService.UpdateDocumentTypeTreeWithBistrem(documentTypeTree).pipe(getFirstCompletedRemoteData()).subscribe((restResponse: RemoteData<NoContent>) => {
+
+      console.log("restResponserestResponse:::", restResponse)
+      if (restResponse.hasSucceeded) {
+        //this.cdRef.detectChanges()
+        this.bitstreamList = [];
+        let newarra = [...this.editNode.parent.data.children];
+        let data = { ...newarra[newarra.indexOf(this.editNode.data)] };
+        this.notificationsService.success("Document  update successfully", { name: "" });
+        data.desc = this.docdesc;
+        data.doc_date = this.datedoc;
+        newarra[newarra.indexOf(this.editNode.data)] = { ...data };
+        this.editNode.parent.data.children = [...newarra];
+        this.tree.treeModel.update();
+        this.modalRef.close();
+        this.cdRef.detectChanges()
+
+
+
+      } else {
+        this.notificationsService.error("Something went wrong please try again", { name: "" });
+      }
+    })
+  }
+  deleteNOde(node) {
+    console.log("deleteNode...", node);
+    if (hasValue(node.data.id)) {
+      const modalRef = this.modalService.open(ConfirmationModalComponent);
+      modalRef.componentInstance.dso = node;
+      modalRef.componentInstance.headerLabel = 'Delete Document Type';
+      modalRef.componentInstance.infoLabel = 'Are you sure you want to delete document Type ?';
+      modalRef.componentInstance.cancelLabel = 'confirmation-modal.delete-documenttype.cancel';
+      modalRef.componentInstance.confirmLabel = 'confirmation-modal.delete-documenttype.confirm';
+      modalRef.componentInstance.brandColor = 'danger';
+      modalRef.componentInstance.confirmIcon = 'fas fa-trash';
+      modalRef.componentInstance.response.pipe(take(1)).subscribe((confirm: boolean) => {
+        if (confirm) {
+          if (node.data.isTemplet) {
+            this.notificationsService.error("Something went wrong please try again", { name: "" });
+          }
+          this.bitstreamList = [];
+          this.cdRef.detectChanges()
+          this.documenttypeTreeService.deleteDocumentTypeTreeWithBistrem(node.data.id).pipe(getFirstCompletedRemoteData()).subscribe((restResponse: RemoteData<NoContent>) => {
+            if (restResponse.hasSucceeded) {
+
+              let newarra = [...node.parent.data.children];
+              newarra.splice(newarra.indexOf(node.data), 1);
+              node.parent.data.children = [...newarra];
+              if (node.parent.data.children.length === 0) {
+                node.parent.data.hasChildren = false;
+              }
+              this.tree.treeModel.update();
+              this.cdRef.detectChanges();
+              // this.cdRef.detectChanges()
+              this.notificationsService.success("Document  deleted successfully", { name: "" });
+            } else {
+              this.notificationsService.error("Something went wrong please try again", { name: "" });
+            }
+          })
+
+
+        }
+      })
+    }
+  }
+  donloadSmartPDF() {
+
+    this.authorizationService.isAuthorized(FeatureID.CanDownload, isNotEmpty(this.smartBistream) ? this.smartBistream.self : undefined)
+    this.authService.getShortlivedToken().pipe(take(1), map((token) =>
+      hasValue(token) ? new URLCombiner(this.smartBistream._links.content.href, `?authentication-token=${token}`).toString() : this.smartBistream._links.content.href)).subscribe((logs: string) => {
+        logs = logs.replace("content", "smartviewcontent") + "&caseType=" + this.itemTab.firstMetadataValue('casefile.case.typename') + "&caseYear=" + this.itemTab.firstMetadataValue('casefile.case.registrationyear') + "&caseNumber=" + this.itemTab.firstMetadataValue('dc.title');
+        window.open(logs, '_blank')
+      });
+
+
+  }
+  viewSmartPDF(opennewtab) {
+
+    this.bitstreamDataService._getMeargePDFByItemID(this.itemTab.id).
+      pipe(getFirstCompletedRemoteData(),
+        take(1)
+      ).subscribe((response: RemoteData<Bitstream>) => {
+        if (response.isSuccess) {
+
+          this.smartBistream = response.payload;
+          if (opennewtab) {
+            // let pdfSrc = this.PDFStaticPath + this.smartBistream._links.content.href + "&item=" + this.itemTab.firstMetadataValue('casefile.case.typename') + "/" + this.itemTab.firstMetadataValue('dc.title') + "/" + this.itemTab.firstMetadataValue('casefile.case.registrationyear');
+            const navigationExtras: NavigationExtras = {
+              state: {
+                file: this.smartBistream._links.content.href,
+                item: this.itemTab.firstMetadataValue('casefile.case.typename') + "/" + this.itemTab.firstMetadataValue('dc.title') + "/" + this.itemTab.firstMetadataValue('casefile.case.registrationyear')
+              }
+            };
+            const link = this.router.serializeUrl(this.router.createUrlTree(['pdfviewer'], { queryParams: { file: this.smartBistream._links.content.href, item: this.itemTab.firstMetadataValue('casefile.case.typename') + "/" + this.itemTab.firstMetadataValue('dc.title') + "/" + this.itemTab.firstMetadataValue('casefile.case.registrationyear') } })).toString();
+            console.log(encodeURI(link))
+            // console.log(decodeURIComponent(link))
+            window.open(encodeURI(link), '_blank');
+          }
+
+          this.cdRef.detectChanges();
+        } else {
+          //this.notificationsService.error("File not open!", { name: "" });
+        }
+
+      })
+  }
+  genratesmartview() {
+    this.lodder = true;
+
+    this.documenttypeTreeService._genrateSmartDocumentView(this.itemTab.id).pipe(
+      getFirstCompletedRemoteData(),
+      take(1)
+    ).subscribe((response: RemoteData<DocumentTypeTree>) => {
+      if (response.isSuccess) {
+        this.smartBistream = response.payload.bitstream;
+        this.notificationsService.success("File merged successfully !", { name: "" });
+        this.lodder = false;
+        this.cdRef.detectChanges();
+      } else {
+        this.notificationsService.error("Fail to merge files", { name: "" });
+        this.lodder = false;
+        this.cdRef.detectChanges();
+      }
+
+
+    })
+  }
+
+
+
+  clickHandler(event: any) {
+    console.log(event.node.data.id)
+  }
+  onNavChange(changeEvent: NgbNavChangeEvent) {
+    if (changeEvent.nextId === 2) {
+      // if (this.loadfirsttime) {
+      //   this.viewSmartPDF(false);
+      //   this.getRootDocument(); 
+      //   this.loadfirsttime = false;
+      // }
+
+
+    }
+  }
+
+  saveJson() {
+    const searchString = this.bitstreamList[0].bitstream.id; // Replace 'your_substring' with the substring you want to search for.
+    var value: string;
+    // Loop through all the keys in localStorage
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      // Check if the value includes the desired substring
+      if (key.includes(searchString)) {
+        // Found a match
+        if (key.includes('myAnnotation')) {
+          if (localStorage.getItem(key)) {
+            value = localStorage.getItem(key);
+          }
+        }
+      }
+    }
+    console.log(value);
+    var data = {}
+    if (this.bitstreamList.length = 1) {
+      data = {
+        bitstreamRest: {
+          uuid: this.bitstreamList[0].bitstream.id
+        },
+        pdfannotationStr: value
+      }
+    }
+    this.documenttypeTreeService.saveAnnotation(data).pipe(
+      getFirstCompletedRemoteData(),
+      take(1)
+    ).subscribe((response: RemoteData<DocumentTypeTree>) => {
+
+      if (response.isSuccess) {
+        this.notificationsService.success("Annotation Saved", { name: "" });
+        this.lodder = false;
+        this.cdRef.detectChanges();
+      } else {
+        this.notificationsService.error("Cannot Save Annotation", { name: "" });
+        this.lodder = false;
+        this.cdRef.detectChanges();
+      }
+    });
+
+    if (!!this.active3) {
+      const searchString = this.active3; // Replace 'your_substring' with the substring you want to search for.
+      var value1: string;
+      // Loop through all the keys in localStorage
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        // Check if the value includes the desired substring
+        if (key.includes(searchString)) {
+          if (key.includes('myAnnotation')) {
+            if (localStorage.getItem(key)) {
+              value1 = localStorage.getItem(key);
+            }
+          }
+        }
+      }
+      const data2 = {
+        bitstreamRest: {
+          uuid: this.active3
+        },
+        pdfannotationStr: value1
+
+      }
+      if (!!value1) {
+        this.documenttypeTreeService.saveAnnotation(data2).pipe(
+          getFirstCompletedRemoteData(),
+          take(1)
+        ).subscribe((response: RemoteData<DocumentTypeTree>) => {
+          if (response.isSuccess) {
+            this.notificationsService.success("Annotation Saved", { name: "" });
+            this.lodder = false;
+            this.cdRef.detectChanges();
+          } else {
+            this.notificationsService.error("Cannot Save Annotation", { name: "" });
+            this.lodder = false;
+            this.cdRef.detectChanges();
+          }
+        });
+      }
+    }
+  }
+
+  sketchpadChangeEvent(event, modal) {
+    debugger;
+    this.modalService.open(modal).result.then(
+      (result) => {
+        if (result === 'ok') {
+          if (event.target.checked) {
+            this.isSkatchpad = true;
+            this.cdRef.detectChanges();
+            localStorage.removeItem(this.noteinfo);
+            this.canvasDataString = null;
+            this.createCanvas();
+          } else {
+            debugger;
+            this.canvasDataString = null;
+            this.isSkatchpad = false;
+            this.noteText.patchValue('');
+            // this.p5Instance.noCanvas();
+            this.cdRef.detectChanges();
+            let data: any = [];
+            data.push({ text: this.noteText.value });
+            localStorage.removeItem(this.noteinfo);
+            localStorage.setItem(this.noteinfo, JSON.stringify(data));
+            // this.saveNotes();
+          }
+        } else {
+          if (event.target.checked) {
+            event.target.checked = false
+          } else {
+            event.target.checked = true;
+          }
+        }
+      });
+  }
+
+  noteTextInput(event: any) {
+    let data: any = []
+    data.push({ text: this.noteText.value });
+    localStorage.setItem(this.noteinfo, JSON.stringify(data));
+    this.saveNotes();
+  }
+
+  @ViewChild('nav', { static: true }) nav: ElementRef;
+
+  scrollTabs(direction: string): void {
+    const navElement = this.nav.nativeElement;
+
+    // Define the scroll distance and direction
+    const scrollAmount = 150; // Adjust the scroll amount as needed
+    const currentScroll = navElement.scrollLeft;
+
+    if (direction === 'left') {
+      navElement.scrollTo({ left: currentScroll - scrollAmount, behavior: 'smooth' });
+    } else if (direction === 'right') {
+      navElement.scrollTo({ left: currentScroll + scrollAmount, behavior: 'smooth' });
+    }
+  }
+
+  generateGeneralNote() {
+    this.generalNote = !this.generalNote;
+    this.cdRef.detectChanges();
+    this.updateDivWidths();
+    this.cdRef.detectChanges();
+    // this.modalRef = this.modalService.open(notepad, { size: 'md',modalDialogClass: 'notepad1' });
+  }
+
+  generalnoteTextInput(event: any) {
+    this.documenttypeTreeService.getGeneralNoteData(this.itemTab.id).pipe(
+      catchError((error) => {
+        let data = {
+          "itemRest": {
+            "uuid": this.itemTab.id
+          },
+          "pdfannotationStr": "",
+          "noteannotatiostr": this.noteText.value
+
+        };
+        this.documenttypeTreeService.saveAnnotation(data).pipe(
+          getFirstCompletedRemoteData(),
+          take(1)
+        ).subscribe((response: RemoteData<DocumentTypeTree>) => {
+          if (response.isSuccess) {
+          }
+        });
+        return error;
+      })
+    ).subscribe((data) => {
+
+    });
+  }
+
+  usePenChangeEvent(event: any) {
+    this.usePen = !this.usePen;
+  }
+
+  onScroll(event: any) {
+    console.log(event.target);
+    const element = event.target;
+    if (element.scrollHeight === element.clientHeight) {
+      debugger;
+      // this.addCanvas();
+    }
+  }
+
+  enathiloadder: boolean = false;
+  downloadenathipdf() {
+
+    this.enathiloadder = true;
+    this.itemDataService.getexcleEndpoint().pipe().subscribe((results) => {
+      this.authService.getShortlivedToken().pipe(take(1), map((token) =>
+        hasValue(token) ? new URLCombiner(results + "/" + this.itemTab.id + "/downloadenathipdf", `?authentication-token=${token}`).toString() : results + "/" + this.itemTab.id + "/downloadenathipdf")).subscribe((logs: string) => {
+          this.enathiloadder = false;
+          window.open(logs);
+        });
+      //window.open(results + "/report/downloadItemReport?startdate=" + startdate + "&enddate=" + enddate)
+    })
+  }
+
+  openNode(pageno) {
+    this.documenttypeTreeService.searchpdfbypagenumber(pageno, this.itemTab.id).pipe(
+      getFirstCompletedRemoteData(),
+      take(1)
+    ).subscribe((response: RemoteData<DocumentTypeTree>) => {
+      console.log("response.......", response);
+      if (response.isSuccess) {
+        response.payload.desc = response.payload.documentType.documenttypename;
+        let obj = { data: response.payload };
+        this.loadPdf(obj);
+        this.cdRef.detectChanges();
+      } else {
+        this.notificationsService.error("Page No not found!");
+      }
+
+
+    })
+  }
+
+  onChangedocument(data: any, isChecked: boolean) {
+    if (isChecked) {
+      this.documentFormArray.push(data);
+    } else {
+      let index = this.documentFormArray.controls.findIndex(x => x.value == data)
+      this.documentFormArray.removeAt(index);
+    }
+  }
+  documentFormArray: any = [];
+  downloadloadder: boolean = false;
+  downloadcertificate() {
+    if (this.documentFormArray.length == 0) {
+      this.notificationsService.error("Select a document!");
+    } else {
+      this.downloadloadder = true;
+      this.itemDataService.getexcleEndpoint().pipe().subscribe((results) => {
+
+        this.authService.getShortlivedToken().pipe(take(1), map((token) =>
+          hasValue(token) ? new URLCombiner(results + "/" + this.itemTab.id + "/downloadpdfmerge?bitstreamuuids=" + this.documentFormArray.toString(), `?authentication-token=${token}`).toString() : results + "/" + this.itemTab.id + "/downloadpdfmerge?bitstreamuuids=" + this.documentFormArray.toString())).subscribe((logs: string) => {
+            this.downloadloadder = false;
+            this.checkboxes.forEach((element) => {
+              element.nativeElement.checked = false;
+            });
+            this.documentFormArray = [];
+            window.open(logs);
+          });
+        //window.open(results + "/report/downloadItemReport?startdate=" + startdate + "&enddate=" + enddate)
+      })
+    }
+
+  }
+  genratepageno() {
+    this.pagelodder = true;
+
+    this.documenttypeTreeService._genrateSmartPageNo(this.itemTab.id).pipe(
+      getFirstCompletedRemoteData(),
+      take(1)
+    ).subscribe((response: RemoteData<DocumentTypeTree>) => {
+      if (response.isSuccess) {
+        //this.smartBistream = response.payload.bitstream;
+        this.notificationsService.success("Page number assing successfully !", { name: "" });
+        this.pagelodder = false;
+        this.cdRef.detectChanges();
+      } else {
+        this.notificationsService.error("Fail to Generate Page No files", { name: "" });
+        this.pagelodder = false;
+        this.cdRef.detectChanges();
+      }
+
+
+    })
+  }
+
+  showpdf(event:any, name:string) {
+    debugger;
+    // this.currentFileViewing = this.dsoNameService.getName(event);
+    this.bitstreamDataService.findById(event.id).pipe(
+      getFirstSucceededRemoteData(),
+      getRemoteDataPayload(),
+    ).subscribe((response: Bitstream) => {
+      this.authorizationService.isAuthorized(FeatureID.CanDownload, isNotEmpty(response) ? response.self : undefined)
+      this.authService.getShortlivedToken().pipe(take(1), map((token) =>
+        hasValue(token) ? new URLCombiner(response._links.content.href, `?authentication-token=${token}`).toString() : response._links.content.href)).subscribe((logs: string) => {
+          this.bitstreamList = [];
+          this.firstviewer = true;
+          let data = { id: response.id, href: response._links.content.href };
+          let obj = {  bitstream: data,name:  name};
+          this.bitstreamList.push(obj); // pdfSrc can be Blob or Uint8Array
+          this.documenttypeTreeService.getAnnotationData(response.id).pipe(
+            catchError((error) => {
+              let data = {
+                bitstreamRest: {
+                  uuid: event.id
+                },
+                pdfannotationStr: "",
+
+              };
+              this.documenttypeTreeService.saveAnnotation(data).pipe(
+                getFirstCompletedRemoteData(),
+                take(1)
+              ).subscribe((response1: RemoteData<DocumentTypeTree>) => {
+                if (response1.isSuccess) {
+
+                  this.id1 = response1.payload !== null ? response1.payload.id : null;
+
+                  this.lodder = false;
+                  this.cdRef.detectChanges();
+                } else {
+                  // this.notificationsService.error("Cannot Save Annotation", { name: "" });
+                  this.lodder = false;
+                  this.cdRef.detectChanges();
+                }
+
+
+
+              });
+              return error;
+            })
+          ).subscribe((data) => {
+            if (!!data['pdfannotationStr'] && data['pdfannotationStr'] !== "{}") {
+              const det = this.parsedData(data['pdfannotationStr']);
+              for (const j of det) {
+                const det2 = this.parsedData(j);
+                const hasNumber = det2.page_id.match(/\d+/g);
+                if (hasNumber[0]) {
+                  localStorage.setItem(response._links.content.href + '_page_fabric_' + hasNumber[0], JSON.stringify(det2));
+                }
+              }
+              if (!!data['noteannotatiostr'] && data['noteannotatiostr'] !== "{}") {
+                const notedata = this.parsedData(data['noteannotatiostr']);
+                let i = 1;
+                for (const obj of notedata) {
+                  for (const key in obj) {
+                    if (Object.hasOwnProperty.call(obj, key)) {
+                      this.noteList.push('Note' + i);
+                      let objkeydata = this.parsedData(obj[key]);
+                      localStorage.setItem(response._links.content.href + '?' + key, JSON.stringify(objkeydata));
+                    }
+                  }
+                }
+              }
+            }
+            if (data['uuid']) {
+              localStorage.setItem(response._links.content.href + '/uuid', data['uuid']);
+              // readFileAnnotations.readFabricAnnotationsForPage();
+            }
+            this.cdRef.detectChanges();
+          });
+          this.active2 = this.bitstreamList[0].bitstream.id;
+          // this.pdfViewer.refresh();
+          this.cdRef.detectChanges(); // Ask pdf viewer to load/refresh pdf
+        });
+    });
+  }
+
+  geFileName(name:string) {
+    if (name.toLowerCase().includes("notesheet")) {
+      return "NoteSheet";
+    } else if (name.toLowerCase().includes("correspondence")) {
+      return "Correspondence";
+    }
+    return name;
+  }
+
+}

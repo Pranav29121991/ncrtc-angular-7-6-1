@@ -1,0 +1,43 @@
+:host {}
+
+.backbox {
+    color: #fff;
+    margin-top: 300px;
+
+    border-radius: 15px;
+    z-index: 1;
+
+}
+
+.backdrop {
+    /*background-image: url("../../assets/images/judges-gavel-book-wooden-table-law-justice-concept-background.jpg");*/
+    /*background-image: url("../../assets/images/wooden-gavel-books-wooden-table-min.jpg");*/
+    background-image: url("../../assets/images/home1.jpg");
+
+    background-size: cover;
+    background-position: center;
+    height: 850px;
+    width: 100vw;
+}
+
+.wrapper {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.container {
+    position: relative;
+}
+
+
+
+@media only screen and (max-width: 600px) {
+    .backbox {
+        padding: 20px 20px;
+    }
+
+    .searchcaption {
+        font-size: larger;
+    }
+}

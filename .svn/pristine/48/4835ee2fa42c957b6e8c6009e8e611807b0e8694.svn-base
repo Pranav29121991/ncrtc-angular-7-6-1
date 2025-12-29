@@ -1,0 +1,10 @@
+<div #scrollContainer>
+    <!-- <div *ngFor="let canvasId of canvasIds;let first = first"> -->
+        <ds-fabric-canvas #canvases *ngIf="canvasIds.length > 0" [canvasId]="canvasIds[0]" [noteInfo]="noteInfo" [penColor]="penColor" [isFirst]="first"
+            [generalNote]="generalNote" [itemId]="itemId" [eraserMode]="eraserMode" (changeInCanvas)="loadCanvases()"
+            [usePen]="usePen"></ds-fabric-canvas>
+    <!-- </div> -->
+    <!-- <div class="btn-div-band">
+        <button (click)="addCanvas()" class="add-new-blue-btn">Add New Page</button>
+    </div> -->
+</div>

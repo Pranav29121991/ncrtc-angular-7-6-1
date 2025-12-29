@@ -1,0 +1,146 @@
+<ng-container *ngVar="(bitstreamRD$ | async) as bitstreamRD">
+  <div class="container" *ngVar="(bitstreamFormatsRD$ | async) as formatsRD">
+    <div class="row" *ngIf="bitstreamRD?.hasSucceeded && formatsRD?.hasSucceeded">
+      <div class="col-md-2">
+        <ds-themed-thumbnail [thumbnail]="bitstreamRD?.payload"></ds-themed-thumbnail>
+      </div>
+      <div class="col-md-10">
+        <div class="container">
+          <div class="row" *ngIf="save_documenttypebutton">
+          <div class="col-12">
+            <form [formGroup]="DocumentypeTempletForm" novalidate>
+              <div class="row">
+                <div class="col-3">
+                  <label class="">Document Type </label>
+                </div>
+                <div class="col-9">
+          
+                  <input formControlName="documenttypeSelect" id="documenttypeSelect" [(ngModel)]='treename' type="text"
+                    (keyup)="getdocumenttypetree($event)" class="form-control col" />
+                  <!-- <span *ngIf="loder"><i class=" ml-2 fa fa-spinner fa-spin fa-lg"></i></span> -->
+                  <ul id="search-results" class="list-group" *ngIf="showdocument"
+                    style="cursor: pointer; height: 67vh;overflow-x: scroll;">
+          
+                    <li *ngFor="let song of states" class="list-group-item">
+          
+                      <span (click)="selectedTree(song)" [innerHTML]="song.templetName"></span>
+                    </li>
+                    <li *ngIf="states.length==0 && !loder">
+                      <strong>No documentType(s) Found </strong>
+                    </li>
+                    <li *ngIf="states.length==0 && loder">
+                      <ds-loading></ds-loading>
+                    </li>
+                  </ul>
+          
+          
+                </div>
+          
+              </div>
+              <div class="row mt-4">
+                <div class="col-4" *ngIf="isDate">
+                  <label class="font-weight-bold" for="task">Document Date</label>
+                  <div class="input-group">
+                    <input class="form-control" placeholder="yyyy-mm-dd" name="dp" [(ngModel)]="modeldate" [startDate]="modeldate"
+                      ngbDatepicker #d="ngbDatepicker" formControlName="documentDate">
+                    <button class="btn btn-outline-secondary calendar" (click)="d.toggle()" type="button"><i
+                        class="fas fa-calendar"></i></button>
+                  </div>
+          
+                </div>
+                <div class="col-4" *ngIf="isRemarks">
+                  <label class="font-weight-bold" for="task">Document Remark</label>
+                  <input id="documentRemark" class="form-control" name="documentRemark" formControlName="documentRemark">
+                </div>
+                <div class="col-4" *ngIf="isDescripition">
+                  <label class="font-weight-bold" for="task">Document Description</label>
+                  <input id="DocumentDescription" class="form-control" name="DocumentDescription"
+                    formControlName="DocumentDescription">
+                </div>
+              </div>
+              <div class="row mt-4" *ngIf="hassubschid">
+                <div class="col-4">
+                  <label class="font-weight-bold" for="task">Sub Child</label>
+                  <select formControlName="documentsubchild" class="form-control" name="documentsubchild" id="documentsubchild">
+                    <option *ngFor="let option of subchidoptions" [ngValue]="option">
+                      {{option.documentType.documenttypename}}
+                    </option>
+                  </select>
+          
+                </div>
+                <div class="col-4" *ngIf="subchidDescipitionoptions.length!=0">
+                  <label class="font-weight-bold" for="task">Description</label>
+                  <select formControlName="documentsubchildDescription" class="form-control" name="documentsubchildDescription"
+                    id="documentsubchildDescription">
+                    <option *ngFor="let option of subchidDescipitionoptions" [ngValue]="option">
+                      {{option.desc}}
+                    </option>
+                  </select>
+          
+                </div>
+              </div>
+              <div class="row mt-4">
+                <div class="col-4">
+                  <button type="button" *ngIf="SelectedTree!=undefined" (click)="onAdd()" class="btn-success btn btn-primary">
+                    <i class="fas fa-plus"></i>Save
+                  </button>
+                  <button type="button" *ngIf="edit_documentTree" (click)="cancleEdit()" class="btn-success btn btn-warning">
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+          </div>
+          <div class="row" *ngIf="!save_documenttypebutton">
+            <div class="col-2">
+              <label class="font-weight-bold" for="task">Document Type</label>
+              <label *ngIf="documentTree_edit.isSubchild">{{documentTree_edit.documentType.documenttypename}}</label>
+              <label *ngIf="!documentTree_edit.isSubchild">{{documentTree_edit.templetTree.documentType.documenttypename}}</label>
+            </div>
+            <div class="col-2" *ngIf="documentTree_edit.templetTree.isDate">
+              <label class="font-weight-bold" for="task">Document Date</label>
+              <label>{{documentTree_edit.doc_date | date:'dd-MM-yyyy'}}</label>
+            </div>
+            <div class="col-3" *ngIf="documentTree_edit.templetTree.isRemark">
+              <label class="font-weight-bold" for="task">Document Remark</label>
+              <label>{{documentTree_edit.remarkdesc}}</label>
+            </div>
+            <div class="col-3" *ngIf="documentTree_edit.templetTree.isDescription && !documentTree_edit.isSubchild">
+              <label class="font-weight-bold" for="task">Document Description</label>
+              <label>{{documentTree_edit.desc}}</label>
+            </div>
+            <div class="col-1" *ngIf="!documentTree_edit.isSubchild">
+              <button class="btn btn-sm btn-primary" (click)="editDocumentTree()" title="Edit document Type "><i
+                  class="fas fa-edit"></i></button>
+            </div>
+            <div class="col-1">
+              <button class="btn btn-sm btn-danger" (click)="deleteDocumenttypeEdit()" title="Delete document Type "><i
+                  class="fas fa-trash-alt fa-fw"></i></button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-12">
+              <h3>{{dsoNameService.getName(bitstreamRD?.payload)}} <span class="text-muted">({{bitstreamRD?.payload?.sizeBytes | dsFileSize}})</span></h3>
+            </div>
+          </div>
+        </div>
+        <ds-form *ngIf="formGroup" [formId]="'edit-bitstream-form-id'"
+                  [formGroup]="formGroup"
+                  [formModel]="formModel"
+                  [formLayout]="formLayout"
+                  [submitLabel]="'form.save'"
+                  (submitForm)="onSubmit()"
+                  (cancel)="onCancel()"
+                  (dfChange)="onChange($event)">
+          <div additional class="container py-3">
+            <a [routerLink]="['/bitstreams', bitstreamRD?.payload?.id, 'authorizations']">{{'bitstream.edit.authorizations.link' | translate}}</a>
+          </div>
+        </ds-form>
+      </div>
+    </div>
+    <ds-error *ngIf="bitstreamRD?.hasFailed" message="{{'error.bitstream' | translate}}"></ds-error>
+    <ds-themed-loading *ngIf="!bitstreamRD || !formatsRD || bitstreamRD?.isLoading || formatsRD?.isLoading"
+                message="{{'loading.bitstream' | translate}}"></ds-themed-loading>
+  </div>
+</ng-container>

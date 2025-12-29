@@ -1,0 +1,434 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="groupbody">
+                <div class="input-group">
+
+                    <input class="datetextbox form-control" placeholder="dd/mm/yyyy" name="dp" [(ngModel)]="model"
+                        ngbDatepicker #d="ngbDatepicker" readonly>
+                    <button class=" calander btn  calendar" (click)="d.toggle()" type="button"><i
+                            class="fas fa-calendar"></i></button>
+
+                </div>
+
+            </div>
+            <div class="body ml-4 mt-3">
+                <button class="btn btn-primary text-white" (click)="genrateCauseList()" [disabled]="lockbutton">Generate
+                    Cause List</button>
+            </div>
+            <div class="body mt-4">
+                <select *ngIf="userList.length>1" [(ngModel)]="userjocode" class="form-control ml-3 col-lg-8">
+                    <option *ngFor="let option of userList" [value]="option">
+                        {{option}}
+                    </option>
+                </select>
+                <div class="col-lg-11 ml-3" *ngIf='causeList.length!=0'
+                    style="position:fixed;width: 30%;    padding-top: 1%;">
+                    <h4 style="    text-align: left;">Cause List</h4>
+                </div>
+                <div class="col-lg-12" style="position:fixed;width: 20%;padding-top: 3%;">
+                    <ul class=" text-primary list-group " *ngFor="let cause1 of causeList; let i=index">
+                        <li class=" liEcourt licursor list-group-item text-center"
+                            [class.active]="selectedIndexactive === i" (click)="getInfo(cause1.cause,i,cause1.data)">
+                            <i class="fa fa-list" aria-hidden="true"></i> {{cause1.cause}}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+
+        </div>
+        <div class="col-lg-9">
+            <ng-container *ngIf="tabs">
+
+                <div class="body" *ngIf="tabs.length == 0 && !loder && firstimegenratecuselist">
+                    <h5>No Cause List found!</h5>
+                </div>
+                <div class="body" *ngIf="tabs.length == 0 && loder && firstimegenratecuselist">
+                    <h5>Generating Cause List!</h5>
+                </div>
+                <div class="body" *ngIf="!firstimegenratecuselist">
+                    <h5>Please select a date and click on generate cause list.</h5>
+                </div>
+                <div class="body" *ngIf="tabs.length > 0">
+                    <ng-container>
+                        <section class="tabs-container">
+                            <span class="change-btn prev" (click)="scrollTab(-1)" [class.hide]="atStart">
+                                <span class="fas fa-2x text-primary fa-angle-left"></span>
+                            </span>
+
+                            <ul class="tabs" [ngStyle]="{'transform': abc }">
+                                <ng-container *ngFor="let tabdata of tabs; let i=index">
+                                    <li class="tab mt-2" [class.active]="selectedIndex===i"
+                                        (click)="selectTab(i,tabdata.data)">
+                                        <span>{{tabdata._benchname}}</span>
+                                        <!-- <ng-container *ngFor="let judges of tabdata.data.causeListType[0].judge;let last = last;">
+                                            <small>{{judges.judge_name}}</small><br *ngIf="!last" />
+                                        </ng-container>-->
+
+                                    </li>
+                                </ng-container>
+                            </ul>
+                            <span class="change-btn next" [class.hide]="atEnd" (click)="scrollTab(1)">
+                                <span class="fas fa-2x text-primary fa-angle-right"></span>
+                            </span>
+                        </section>
+                    </ng-container>
+                </div>
+                <ds-loading *ngIf="loder  && firstimegenratecuselist" message="{{'' | translate}}"></ds-loading>
+
+            </ng-container>
+
+            <div class="body  ">
+                <div class="mb-3 pt-2 pb-2 text-center col-lg-12 ng-tns-c325-15"
+                    style="box-shadow: 0 0 5px rgba(0,0,0,.5);border-radius: 10px;background-color: #f0f8ff;"
+                    *ngIf="judgeName.length>0">
+
+                    <!-- <b class=" h5 header-title float-center" *ngIf="causelistcode >= '1600'">HON'BLE MRS. JUSTICE SINDHU SHARMA</b>
+                    <b class=" h5 header-title float-center" *ngIf="causelistcode < '1600'"  >HON'BLE MRS. JUSTICE SINDHU SHARMA</b> -->
+                    <!-- <h5 class=" float-center" *ngIf="causelisttypename!=''"><b>HIGH COURT OF BIHAR</b></h5> -->
+                    <b class=" float-center" *ngIf="causelisttypename!=''">
+                        {{causelisttypename | uppercase}} CAUSELIST For
+                        {{date1 | date:'EEEE dd MMM yyyy'}}
+                    </b><br>
+                    <b class="  float-center" *ngIf="batchid!==undefined">{{batchid._benchname}}(BENCH
+                        ID-{{batchid.for_bench_id}})</b>
+                    <br>
+                    <div *ngFor="let jname of judgeName ">
+                        <h5 class="   float-center"><b>{{jname.judge_name}}</b></h5>
+                    </div>
+
+                    <ds-loading *ngIf="loder2" message="{{'' | translate}}"></ds-loading>
+
+                </div>
+                <div>
+
+                    <div *ngIf="!loder2">
+
+                        <div class="col-lg-12" *ngFor="let case1 of caseFiles ;let i = index" >
+                            <div class="row mb-3 border-bottom" *ngIf="i===0" style="position: sticky;top: 0;background-color: #fff;z-index: 1;">
+                                <div class="col-lg-3">
+                                    <b>Sr.No</b> <b class="ml-3">Case Number</b>
+                                </div>
+                                <div class="col-lg-3">
+                                    <b>Main Parties</b>
+                                </div>
+                                <div class="col-lg-3">
+                                    <b>Petitioner Advocate</b>
+                                </div>
+                                <div class="col-lg-3">
+                                    <b>Respondent Advocate</b>
+                                </div>
+                            </div>
+                            <div class="mb-3 row text-center">
+                                <b class=" header-title float-center">
+                                    {{getFromCharCode(i+97)}}) <u class="text-uppercase">{{case1.causelistType}}</u>
+                                </b>
+                            </div>
+                            <div class="mb-3 row rowEcourt" *ngFor="let case2 of case1.causeList;let k = index;">
+                                <ng-container *ngIf="getshowHidePurpose(case1.purpose_cd)">
+                                    <div class="mb-2 mt-3 ml-1 row w-100" *ngIf="case2.caseFile.civilt2iafiling[0].length!=0;">
+                                        
+                                        <div class="col-lg-12" *ngFor="let Iacase of case2.caseFile.civilt2iafiling[0];let first=first">
+                                            <b *ngIf="first">
+                                                {{case2.sr_no}} )
+                                            </b>
+                                            <span class="small " *ngIf="Iacase.ia_status!='Disposed'">
+                                                <b> {{Iacase.ia_case_type_name}}/{{Iacase.ia_regno}}/{{Iacase.ia_regyear}} </b><span
+                                                    *ngIf="Iacase.ia_nature != undefined && Iacase.ia_nature.length!=0"> FOR
+                                                    {{Iacase.ia_nature}}</span>
+                                    
+                                            </span>
+                                        </div>
+                                        <div class="col-lg-12">
+                                            <b>IN</b>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                                
+                                <div class="col-lg-3">
+                                    <b *ngIf="!getshowHidePurpose(case1.purpose_cd) || case2.caseFile.civilt2iafiling[0].length==0">
+                                        {{case2.sr_no}} )
+                                    </b>
+                                   
+                                    <a style="cursor: pointer;" class="font-weight-bold"
+                                        [ngStyle]="{'color':case2.caseFile.active  ? '#CF4444' :'#343a40' }"
+                                        (click)="opennewtab('/entities/casefile/',case2.caseFile.dspaceobjectid,case2.caseFile)">
+
+                                        {{case2.caseFile.civilt2naturet ? case2.caseFile.civilt2naturet :
+                                        case2.caseFile.casetype
+                                        }}/{{case2.caseFile.reg_no.toString().replace('9900','')}}/{{case2.caseFile.reg_year}}<span
+                                            *ngIf="case2.caseFile.reg_no.toString().match('9900')"> (P)</span>
+                                    </a>
+                                    <a class="btn btn-secondary btn-sm ml-1 text-white"
+                                    *ngIf="case2.caseFile.dspaceobjectid !=undefined "
+                                    title="Smart View" (click)="viewSmartNote(notepad, case2.caseFile.dspaceobjectid,$event)"><i class="fa fa-book"
+                                        aria-hidden="true"></i></a>
+                                    <a class="btn  btn-sm ml-1 text-white"
+                                        [ngClass]="case2.caseFile.active1 ? 'btn-danger' : 'btn-primary'"
+                                        *ngIf="case2.caseFile.dspaceobjectid !=undefined && case2.caseFile.bitstream !=undefined"
+                                        title="Smart View" (click)="viewSmartPDF(case2.caseFile)"><i class="fa fa-eye"
+                                            aria-hidden="true"></i></a>
+                                    <a class="btn btn-success btn-sm ml-1 text-white " title="Generate smart View"
+                                        *ngIf="case2.caseFile.dspaceobjectid !=undefined "
+                                        (click)="genratesmartview(case2.caseFile)">
+                                        <i class="fa fa-file-archive" aria-hidden="true"></i>
+                                        <i *ngIf="case2.caseFile.lodder" class="fa ml-2 fa-spinner fa-spin"></i></a>
+
+
+                                </div>
+                                <div class="col-lg-3">{{case2.caseFile.pet_name }}
+                                    <span *ngIf="getsenior(case2.caseFile.pet_age)">(Senior Citizen)</span>
+                                    <span *ngIf="case2.petitionerorganization">
+                                        ({{case2.caseFile.petitionerorganization}})</span>
+
+                                    <br><b class="font-italic"> Vs </b><br>
+                                    {{case2.caseFile.res_name}}
+                                    <span *ngIf="getsenior(case2.caseFile.res_age)">(Senior Citizen)</span>
+                                    <span *ngIf="case2.respondentorganization">
+                                        ({{case2.caseFile.respondentorganization}})</span>
+
+                                </div>
+                                <div class="col-lg-3 mb-2"><span *ngIf="case2.caseFile.pet_adv"
+                                        [innerHTML]="getpet(case2.caseFile.pet_adv)"></span>
+                                    <!-- <span *ngIf="case2.caseFile.civilt2extraadvt[0]" [innerHTML]="getpet(case2.caseFile.civilt2extraadvt[0])"></span> -->
+
+
+                                </div>
+                                <div class="col-lg-3 mb-2">
+                                    <span *ngIf="case2.caseFile.res_adv"
+                                        [innerHTML]="getresponse(case2.caseFile.res_adv)"></span>
+
+
+                                </div>
+                                <ng-container *ngIf="!getshowHidePurpose(case1.purpose_cd)">
+                                    <div class="mb-2 mt-3 ml-1 row w-100" *ngIf="case2.caseFile.civilt2iafiling[0].length!=0;">
+                                        <div class="col-lg-12">
+                                            <b>WITH</b>
+                                        </div>
+                                        <div class="col-lg-12" *ngFor="let Iacase of case2.caseFile.civilt2iafiling[0];">
+                                    
+                                            <span class="small " *ngIf="Iacase.ia_status!='Disposed'">
+                                                <b> {{Iacase.ia_case_type_name}}/{{Iacase.ia_regno}}/{{Iacase.ia_regyear}} </b><span
+                                                    *ngIf="Iacase.ia_nature != undefined && Iacase.ia_nature.length!=0"> FOR
+                                                    {{Iacase.ia_nature}}</span>
+                                    
+                                            </span>
+                                            <!-- <span *ngIf="Iacase.old_ia_no">[{{Iacase.old_ia_no}}]</span> -->
+                                        </div>
+                                    </div>
+                                </ng-container>
+                              
+                               
+                                <div class="mb-2 mt-4 ml-1 row w-100"
+                                    *ngFor="let subcase of case2.caseFile.civilt2connected[0];let cont=index">
+                                        <ng-container *ngIf="getshowHidePurpose(case1.purpose_cd)">
+                                            
+                                            <div class="mb-2 mt-3 ml-1 row w-100" *ngIf="subcase.connect_iafile[0].length !=0">
+                                                <P><b>CONNECTED WITH</b></P>
+                                               
+                                                <div class="col-lg-12" *ngFor="let Iacase of subcase.connect_iafile[0];let first=first">
+                                                    <b *ngIf="first">
+                                                        {{case2.sr_no}}({{1+cont}})
+                                                    </b>
+                                                    <span class="small " *ngIf="Iacase.ia_status!='Disposed'">
+                                                        <b> {{Iacase.ia_case_type_name}}/{{Iacase.ia_regno}}/{{Iacase.ia_regyear}} </b><span
+                                                            *ngIf="Iacase.ia_nature != undefined && Iacase.ia_nature.length!=0"> FOR
+                                                            {{Iacase.ia_nature}}</span>
+                                        
+                                                    </span>
+                                                    <!-- <span *ngIf="Iacase.old_ia_no">[{{Iacase.old_ia_no}}]</span> -->
+                                                </div>
+                                                <div class="col-lg-12">
+                                                    <b>IN</b>
+                                                </div>
+                                            </div>
+                                        </ng-container>
+                                    <div class="mb-2 mt-3 ml-1 row w-100" *ngIf="!getshowHidePurpose(case1.purpose_cd) || subcase.connect_iafile[0].length==0">
+                                        <P ><b>CONNECTED WITH</b></P>
+                                    </div>
+                                        <div class="col-lg-3">
+                                            
+                                            <b *ngIf="!getshowHidePurpose(case1.purpose_cd) || subcase.connect_iafile[0].length==0">
+                                            {{case2.sr_no}}({{1+cont}})
+                                            </b>
+                                            <a class=" font-weight-bold" style="cursor: pointer;"
+                                                (click)="opennewtab('/entities/casefile/',subcase.dspaceobjectid,subcase)"
+                                                [ngStyle]="{'color':subcase.active ? '#CF4444' :'#343a40' }">
+                                                {{subcase.nature_t ? subcase.nature_t :
+                                                subcase.link_type_name}}/{{subcase.link_reg_no.toString().replace('9900','')}}/{{subcase.link_reg_year}}
+                                                <span *ngIf="subcase.link_reg_no.toString().match('9900')">(P)</span>
+                                            </a>
+                                            <a class="btn btn-secondary btn-sm ml-1 text-white" *ngIf="subcase.dspaceobjectid !=undefined " title="Smart View"
+                                                (click)="viewSmartNote(notepad, subcase.dspaceobjectid,$event)"><i class="fa fa-book" aria-hidden="true"></i></a>
+                                            <a class="btn  btn-sm ml-1 text-white"
+                                                [ngClass]="subcase.active1 ? 'btn-danger' : 'btn-primary'"
+                                                *ngIf="subcase.dspaceobjectid !=undefined && subcase.bitstream !=undefined"
+                                                title="Smart View" (click)="viewSmartPDF(subcase)"><i class="fa fa-eye"
+                                                    aria-hidden="true"></i></a>
+                                            <a class="btn btn-success btn-sm ml-1 text-white "
+                                                title="Generate smart View" *ngIf="subcase.dspaceobjectid !=undefined "
+                                                (click)="genratesmartview(subcase)">
+                                                <i class="fa fa-file-archive" aria-hidden="true"></i>
+                                                <i *ngIf="subcase.lodder" class="fa ml-2 fa-spinner fa-spin"></i>
+                                            </a>
+                                           
+                                           
+                                        </div>
+                                        <div class="col-lg-3">{{subcase.pet_name}}
+                                            <br><b class="font-italic"> Vs </b><br>
+                                            {{subcase.res_name}}
+
+                                        </div>
+                                        <div class="col-lg-3"><span *ngIf="subcase.pet_adv"
+                                                [innerHTML]="getpet(subcase.pet_adv)"></span>
+                                            <!-- <span *ngIf="subcase.extraAdvocate[0]" [innerHTML]="getpet(subcase.extraAdvocate[0])"></span> -->
+
+
+                                        </div>
+                                        <div class="col-lg-3">
+                                            <span *ngIf="subcase.res_adv"
+                                                [innerHTML]="getresponse(subcase.res_adv)"></span>
+                                            <!-- <span *ngIf="subcase.extraAdvocate[0]" [innerHTML]="getresponse(subcase.extraAdvocate[0])"></span> -->
+
+                                        </div>
+                                        <ng-container *ngIf="!getshowHidePurpose(case1.purpose_cd)">
+                                        <div class="mb-2 mt-3 ml-1 row w-100" *ngIf="subcase.connect_iafile[0].length!=0">
+                                        <div class="col-lg-12">
+                                            <b>WITH</b>
+                                        </div>
+                                        <div class="col-lg-12" *ngFor="let Iacase of subcase.connect_iafile[0];">
+
+                                            <span class="small " *ngIf="Iacase.ia_status!='Disposed'">
+                                                <b> {{Iacase.ia_case_type_name}}/{{Iacase.ia_regno}}/{{Iacase.ia_regyear}} </b><span
+                                                    *ngIf="Iacase.ia_nature != undefined && Iacase.ia_nature.length!=0"> FOR
+                                                    {{Iacase.ia_nature}}</span>
+
+                                            </span>
+                                            <!-- <span *ngIf="Iacase.old_ia_no">[{{Iacase.old_ia_no}}]</span> -->
+                                        </div>
+                                        </div>
+                                </ng-container>
+
+                                </div>
+                               
+
+                            
+
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="col-lg-4 smart-note">
+        <p>I am visible</p>
+    </div> -->
+    <div id="mydiv" class="col-lg-4 smart-note" *ngIf='smartnote' [ngStyle]="myDivStyle" style="border: 1px solid #80808038;
+    border-radius: 13px;
+    overflow: auto;z-index: 13;">
+        <div>
+            <div class="row main-haeder-picker" id="mydivheader" style="align-items: center; margin: 0px;">
+                <div class="left-band" *ngIf="isSkatchpad">
+                    <button class="color-picker" [ngClass]="penColor === '#ff0000' ? 'selected-pen' : ''"
+                        style="background-color: red;height: 15px;border-radius: 9px;" (click)="setPenColor('#ff0000')"
+                        title="Ink color"></button>
+                    <button class="color-picker" [ngClass]="penColor === '#0000ff' ? 'selected-pen' : ''"
+                        style="background-color: blue;height: 15px;border-radius: 9px; margin-left: 5px;margin-right: 5px;"
+                        (click)="setPenColor('#0000ff')" title="Ink color"></button>
+                    <button class="color-picker" [ngClass]="penColor === '#000000' ? 'selected-pen' : ''"
+                        style="background-color: black;height: 15px;border-radius: 9px;" (click)="setPenColor('#000000')"
+                        title="Ink color"></button>
+                    <button class="btn eraser-btn" [ngClass]="penColor === '#ffffff' ? 'selected-pen' : ''"
+                        (click)="setPenColor('#ffffff')" title="Eraser"><i class="fa-solid fa-eraser"
+                            style="font-size: 25px;"></i></button>
+                </div>
+                <div class="right-band">
+                    <!-- <div class="chekbox-band">
+                                  <label>Use Pen</label>
+                                  <input type="checkbox" data-toggle="switchbutton"
+                                    (change)="usePenChangeEvent($event)" checked data-onstyle="primary">
+                                </div> -->
+                    <div class="chekbox-band">
+                        <label>Sketchpad</label>
+                        <input type="checkbox" data-toggle="switchbutton" [formControl]="sketchpadCheckBox"
+                            (change)="sketchpadChangeEvent($event,content2)" checked data-onstyle="primary">
+                    </div>
+                    <button id="save-button" class="btn" (click)="closeNote()" title="Close"><i
+                            class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            <div class="canvas" style='width: 100%;'>
+            <ds-canvas-manager class="canvses" *ngIf="isSkatchpad" [noteInfo]="noteinfo" [penColor]="penColor" [generalNote]="true" [itemId]="itemId"
+              [eraserMode]="isEraser" [usePen]="usePen"></ds-canvas-manager>
+            </div>
+            <angular-editor *ngIf="!isSkatchpad" [formControl]="noteText" (input)="noteTextInput($event)"></angular-editor>
+          </div>
+    </div>
+</div>
+
+<ng-template style="margin-right: unset!important;" #notepad let-c="close" let-d="dismiss">
+    <div>
+      <div class="row" id="mydivheader" style="align-items: center; margin: 0px;">
+        <div class="col-4" style="margin-right: 8px;margin-top: 7px;">
+          <label>Sketchpad</label>
+          <input type="checkbox" data-toggle="switchbutton" [formControl]="sketchpadCheckBox"
+            (change)="sketchpadChangeEvent($event,content2)" checked data-onstyle="primary">
+        </div>
+        <div class="col-4" *ngIf="isSkatchpad">
+  
+          <button class="color-picker" style="background-color: red;height: 15px;border-radius: 9px;"
+            (click)="setPenColor('#ff0000')" title="Ink color"></button>
+          <button class="color-picker"
+            style="background-color: blue;height: 15px;border-radius: 9px; margin-left: 5px;margin-right: 5px;"
+            (click)="setPenColor('#0000ff')" title="Ink color"></button>
+          <button class="color-picker" style="background-color: black;height: 15px;border-radius: 9px;"
+            (click)="setPenColor('#000000')" title="Ink color"></button>
+          <button class="btn" (click)="setPenColor('#ffffff')" title="Eraser"><i class="fa-solid fa-eraser"
+              style="font-size: 25px;"></i></button>
+          <!-- <button class="btn btn-primary" (click)="clearskatchpad()">Clear</button> -->
+  
+          <!-- <button id="save-button" class="btn" (click)="genratesmartnote()" title="Close"><i class="fa-solid fa-xmark"></i></button> -->
+        </div>
+        <div class="col-3 d-flex justify-content-end">
+          <button id="save-button" class="btn" (click)="c('ok')" title="Close"><i class="fa-solid fa-xmark"
+              style="font-size: 25px;"></i></button>
+        </div>
+      </div>
+      <!-- <div id="sketch-holder" #canvasContainer *ngIf="isSkatchpad" class="cursur-cus">
+    </div> -->
+      <ds-canvas-manager class="canvses" *ngIf="isSkatchpad" [noteInfo]="noteinfo" [penColor]="penColor" [generalNote]="true" [itemId]="itemId"
+        [eraserMode]="isEraser" [usePen]="usePen"></ds-canvas-manager>
+      <div>
+      </div>
+      <angular-editor *ngIf="!isSkatchpad" [formControl]="noteText" (input)="noteTextInput($event)"></angular-editor>
+    </div>
+  </ng-template>
+
+  <ng-template #content2 let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title text-danger">Warning</h4>
+      <button type="button" id="delete_close" class="close" aria-label="Close" (click)="d('cancel')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>If you change note style it will delete previously added data. Do you want to continue?</p>
+    </div>
+    <div class="modal-footer">
+      <div class="btn-group mb-1">
+        <ul style="color: white;">
+          <li class="button" (click)="c('cancel')">
+            <a>{{'submission.general.discard.confirm.cancel' | translate}}</a>
+          </li>
+          <li class="red-bg button btn-danger" (click)="c('ok')">
+            <a>{{'submission.general.discard.confirm.submit' | translate}}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </ng-template>

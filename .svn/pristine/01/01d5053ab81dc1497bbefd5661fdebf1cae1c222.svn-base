@@ -1,0 +1,531 @@
+<div class="container-fluid  m-0 p-0" style="width:130%">
+  <div class="row m-0 p-0">
+    <div [ngClass]="{'col-2': !fullleft && !fullright && leftOpen, 'col-12' : fullright }" class="  p-0"
+    *ngIf="(!fullright  && !fullleft && leftOpen) || fullright" [@slideInOut]>
+      <img *ngIf="fullright" (click)="fullrightC()" class="rightFull cursor" src="assets/dsquareIcon/leftFull.png"
+        alt="" />
+      <ul ngbNav #nav="ngbNav" (navChange)="onNavChange($event)" [(activeId)]="active" class="nav-tabs">
+        <li [ngbNavItem]="1">
+          <a ngbNavLink>Properties</a>
+          <ng-template ngbNavContent>
+
+            <ds-tree-view [pageRoute]="pageRoute" [itemTab]="itemTab"></ds-tree-view>
+          </ng-template>
+        </li>
+        <li [ngbNavItem]="2" style=" height: 100%;">
+          <a ngbNavLink>Table of Content</a>
+
+          <ng-template ngbNavContent>
+
+            <div class="row mt-2">
+              <div class="col-6 ">
+                <a class="btn btn-primary   text-white" (click)="genratesmartview()" title="Generate smart view"> <i class="fa fa-cog  mr-1"></i>View<i
+                    *ngIf="lodder" class="fa ml-2 fa-2xs fa-spinner fa-spin"></i></a>
+              </div>
+              <div class="col-3  p-0">
+                <a class="btn btn-primary  text-white" *ngIf="smartBistream" (click)="viewSmartPDF(true)" title=" Open Smart View"><i
+                    class="fa fa-eye " aria-hidden="true"></i></a>
+              </div>
+              <div class="col-3  p-0">
+                <a class="btn btn-primary  text-white" *ngIf="smartBistream" (click)="donloadSmartPDF()" title=" Download Smart View"><i class="fa fa-download "
+                    aria-hidden="true"></i></a>
+              </div>
+            </div>
+              <div class="row mt-2" >
+                  <div class="col-6">
+                    <a class="btn btn-success p-2  text-white" (click)="genratepageno()" 
+                      title="Generate Page No"><i class="fa fa-refresh  mr-1"></i><i *ngIf="pagelodder"
+                        class="fa ml-2 fa-2xs fa-spinner fa-spin"></i>E-TOC</a>
+
+                    <a class="btn btn-success p-2  text-white" style="display: none;" (click)="downloadcertificate()"><i class="fa fa-download  mr-2"></i>
+                      65B <i *ngIf="downloadloadder" class="fa ml-2 fa-2xs fa-spinner fa-spin"></i></a>
+                  </div>
+                  <div class="col-6  p-0">
+                    <a class="btn btn-success p-2  text-white" (click)="downloadenathipdf()"><i class="fa fa-download  mr-2"></i>
+                      E-nathi<i *ngIf="enathiloadder" class="fa ml-2 fa-2xs fa-spinner fa-spin"></i></a>
+                  </div>
+                </div>
+
+                <!-- <a class="btn btn-success p-2 mt-3 text-white" (click)="genratepageno()" style="width: 200px;" title="Generate Page No"><i class="fa fa-refresh  mr-1"></i><i
+                    *ngIf="pagelodder" class="fa ml-2 fa-2xs fa-spinner fa-spin"></i>E-TOC</a>
+             -->
+              
+             <!-- <div class="row mt-3" >
+              <div class="col-7"><input type="text" placeholder="Search page" class="form-control" [(ngModel)]="serachpageno"></div>
+              <div class="col-5 p-0 m-0"><button class="btn btn-secondary" (click)="openNode(serachpageno)">Search</button></div>
+              
+             </div>   -->
+             
+             
+            <ds-loading *ngIf="loder" message="{{'' | translate}}"></ds-loading>
+            <div style="height: 71vh; overflow: scroll; width: 99%;">
+              <tree-root #tree [focused]="true" [nodes]="nodeItems" [options]="treeOptions" *ngIf="showtree">
+                <ng-template #treeNodeWrapperTemplate let-node let-index="index" let-templates="templates">
+                  <div class="node-wrapper" *ngIf="node.data.display" [style.padding-left]="node.getNodePadding()">
+                    <div style="width: 100%;" class="  " (click)="node.mouseAction('click', $event)"
+                      (dblclick)="node.mouseAction('dblClick', $event)"
+                      (contextmenu)="node.mouseAction('contextMenu', $event)" (treeDrop)="node.onDrop($event)"
+                      [treeAllowDrop]="node.allowDrop" [treeDrag]="node" [treeDragEnabled]="node.allowDrag()">
+                      <tree-node-content [node]="node" [index]="index" [template]="treeNodeTemplate">
+                      </tree-node-content>
+                    </div>
+                  </div>
+                </ng-template>
+                <ng-template #treeNodeTemplate let-node let-index="index">
+                  <div class="container-fluid">
+                    <div class="row mt-3">
+                      <div class="col-lg-1">
+                        <div style="color: #6C757D" *ngIf="node.data.children.length > 0 ">
+                          <i *ngIf="node.isCollapsed" (click)="node.toggleExpanded()" class="fa fa-chevron-right"></i>
+                          <i *ngIf="node.isExpanded" (click)="node.toggleExpanded()" class="fa fa-chevron-down"></i>
+                        </div>
+
+                      </div>
+                      <div class="rowEcourt col-lg-10 pl-1">
+                        <span class="spanclik" *ngIf="!node.data.isTemplet"><i class="fa fa-file"
+                            aria-hidden="true"></i></span>
+                        <span class="spanclik" style="font-size:12px"
+                          *ngIf="!node.data.isTemplet && node.data.desc ==null && !node.data.isSubchild">
+                          <input type="checkbox" *ngIf="isSiteAdmin" #checkboxes style="display: none;"
+                            (change)="onChangedocument(node.data.bitstream.id, $event.target.checked)" class=" ml-2 mr-2 float-left">
+                          <span (click)="loadPdf(node)"> {{node.data.doc_date | date:'dd/MM/yyyy' }}
+                            <!-- <span
+                              *ngIf="node.data.bitstream.startPage!=null && node.data.bitstream.endPage!=null">({{node.data.bitstream.startPage}} -
+                              {{node.data.bitstream.endPage}})</span> -->
+                          </span>
+                          <a class="ml-2 " *ngIf="isSiteAdmin && !node.data.nonrepetitive"
+                            (click)="editNOde(modalContent,node)"><i class="fa text-primary fa-edit fa-lg"></i></a>
+                          <!-- open noraml eg.likes ORDER with date without DESC -->
+                          <a class="ml-2" (click)="deleteNOde(node)"
+                            *ngIf="isSiteAdmin && node.data.children.length == 0 && !node.data.isTemplet && !node.data.nonrepetitive"><i
+                              class="fa fa-trash fa-lg text-danger"></i></a>
+                          <a class="float-right mt-1 " (click)="sencodview(node)"><i
+                              class="fas text-primary fa-columns fa-fw fa-lg" aria-hidden="true"></i></a>
+
+                        </span>
+                        <span class="spanclik" style="font-size:12px"
+                          *ngIf="!node.data.isTemplet  && node.data.isSubchild && node.data.bitstream!=null">
+                          <input type="checkbox" *ngIf="isSiteAdmin" #checkboxes style="display: none;"
+                            (change)="onChangedocument(node.data.bitstream.id, $event.target.checked)" class=" ml-2 mr-2 float-left">
+                          <span (click)="loadPdf(node)">{{ node.data.documentType.documenttypename }}
+                            <!-- <span
+                              *ngIf="node.data.bitstream.startPage!=null && node.data.bitstream.endPage!=null">({{node.data.bitstream.startPage}} -
+                              {{node.data.bitstream.endPage}})</span> -->
+                          </span>
+                          <a class="ml-2 " *ngIf="isSiteAdmin"
+                            [routerLink]="['/bitstreams/', node.data.bitstream.id, 'edit']"
+                            [queryParams]="{itemId: itemTab.id}" target="_blank"><i
+                              class="fa text-primary fa-edit fa-lg"></i></a>
+                          <a class="float-right mt-1 " (click)="sencodview(node)"><i
+                              class="fas text-primary fa-columns fa-fw fa-lg" aria-hidden="true"></i></a>
+                          <!--sub chid edit -->
+                          <!--open  <a class="ml-2" (click)="deleteNOde(node)" *ngIf="node.data.children.length == 0 && !node.data.isTemplet"><i class="fa fa-trash fa-lg text-danger"></i></a> -->
+                        </span>
+                        <span class=" spanclik" style="font-size:12px" data-toggle="tooltip" data-placement="top"
+                          title="{{node.data.desc }}"
+                          *ngIf="!node.data.isTemplet  && !node.data.isSubchild && node.data.desc !==null ">
+                          <input type="checkbox" *ngIf="isSiteAdmin" #checkboxes style="display: none;"
+                            (change)="onChangedocument(node.data.bitstream.id, $event.target.checked)" class=" ml-2 mr-2 float-left">
+                          <span (click)="loadPdf(node)">{{node.data.desc}} 
+                            <!-- <span *ngIf="node.data.bitstream.startPage!=null && node.data.bitstream.endPage!=null">({{node.data.bitstream.startPage}} - {{node.data.bitstream.endPage}})</span> -->
+                          </span>
+                          <a class="ml-2 " *ngIf="isSiteAdmin && !node.data.isTemplet && node.data.nonrepetitive"
+                            [routerLink]="['/bitstreams/', node.data.bitstream.id, 'edit']"
+                            [queryParams]="{itemId: itemTab.id}" target="_blank"><i
+                              class="fa text-primary fa-edit fa-lg"></i></a>
+                          <a class="ml-2 " *ngIf="isSiteAdmin && !node.data.isTemplet && !node.data.nonrepetitive"
+                            (click)="editNOde(modalContent,node)"><i class="fa text-primary fa-edit fa-lg"></i></a>
+                          <!-- open noraml eg.likes ORDER with DESC without DAte -->
+                          <a class="ml-2" (click)="deleteNOde(node)"
+                            *ngIf="isSiteAdmin && node.data.children.length == 0 && !node.data.isTemplet && !node.data.nonrepetitive"><i
+                              class="fa fa-trash fa-lg text-danger"></i></a>
+                          <a class="float-right mt-1 " (click)="sencodview(node)"><i
+                              class="fas text-primary fa-columns fa-fw fa-lg" aria-hidden="true"></i></a>
+                          <!-- opennoraml eg.likes ORDER with DESC without DAte -->
+                          <!-- open <a class="ml-2"  (click)="deleteNOde(node)" *ngIf="node.data.children.length == 0 && !node.data.isTemplet"><i class="fa fa-trash fa-lg text-danger"></i></a> -->
+                        </span>
+                        <span class=" spanclik" (click)="node.toggleExpanded()" style="font-size:12px"
+                          data-toggle="tooltip" data-placement="top" title="{{node.data.desc }}"
+                          *ngIf="!node.data.isTemplet  && node.data.isSubchild && node.data.desc !==null && node.data.bitstream==null ">{{node.data.desc}}
+                          <a class="ml-2 " *ngIf="isSiteAdmin && !node.data.nonrepetitive"
+                            (click)="editNOde(modalContent,node)"><i class="fa text-primary fa-edit fa-lg"></i></a>
+                        </span>
+                        <span class="spanclik" (click)="node.toggleExpanded()"
+                          *ngIf="node.data.children.length > 0 && node.data.isTemplet && node.data.bitstream==null"> {{
+                          node.data.documentType.documenttypename }}
+
+                        </span>
+                        <span class="spanclik" *ngIf="node.data.isTemplet && node.data.bitstream!=null">
+                          <input type="checkbox" *ngIf="isSiteAdmin" #checkboxes style="display: none;"
+                            (change)="onChangedocument(node.data.bitstream.id, $event.target.checked)" class=" ml-2 mr-2 float-left">
+                          <span (click)="loadPdf(node)"> {{node.data.documentType.documenttypename }}
+                            <!-- <span
+                              *ngIf="node.data.bitstream.startPage!=null && node.data.bitstream.endPage!=null">({{node.data.bitstream.startPage}} -
+                              {{node.data.bitstream.endPage}})</span> -->
+                          </span>
+                          <a class="ml-2 " *ngIf="isSiteAdmin && !node.data.nonrepetitive"
+                            (click)="editNOde(modalContent,node)"><i class="fa text-primary fa-edit fa-lg"></i></a>
+                          <!--  noraml eg.likes ORDER with DESC without DAte -->
+                          <a class="ml-2" (click)="deleteNOde(node)"
+                            *ngIf="isSiteAdmin && node.data.children.length == 0 && !node.data.isTemplet && !node.data.nonrepetitive"><i
+                              class="fa fa-trash fa-lg text-danger"></i></a>
+                          <a class="float-right mt-1 " (click)="sencodview(node)"><i
+                              class="fas text-primary fa-columns fa-fw fa-lg" aria-hidden="true"></i></a>
+                          <!-- noraml eg.likes ORDER with DESC without DAte-->
+                          <!-- <a class="ml-2" (click)="deleteNOde(node)" *ngIf="node.data.children.length == 0 && !node.data.isTemplet"><i
+                              class="fa fa-trash fa-lg text-danger"></i></a>    open-->
+                        </span>
+
+                      </div>
+                    </div>
+                  </div>
+                </ng-template>
+              </tree-root>
+            </div>
+          </ng-template>
+          <ds-related-items [parentItem]="itemTab" [relationType]="'ConnectedCaseOfCaseFile'"
+            [label]="'Connected Case(s)'">
+          </ds-related-items>
+        </li>
+        <li [ngbNavItem]="3" style="height: 100%;">
+          <a ngbNavLink>Note</a>
+          <ng-template ngbNavContent>
+            <a class="btn btn-success ml-2 mt-2  text-white" (click)="generateGeneralNote()"
+              style="width: 198px;">Generate Note <i *ngIf="lodder" class="fa ml-2 fa-2xs fa-spinner fa-spin"></i></a>
+          </ng-template>
+        </li>
+      </ul>
+      <div [ngbNavOutlet]="nav" class="mt-2"></div>
+      <div class=" d-flex align-items-end flex-column">
+        <!-- <img *ngIf="!fullleft && !fullright && leftOpen" (click)="fullrightC()" class="rightArrow cursor"
+          src="assets/dsquareIcon/rightArrow.png" alt="" /> 
+        <br /> -->
+
+        <img *ngIf=" !fullright && !fullleft && leftOpen" (click)="fullleftC()" class="leftArrow cursor"
+          src="assets/dsquareIcon/leftArrow.png" alt="" />
+
+      </div>
+    </div>
+    <div [ngClass]="{'col-10': !fullleft && !fullright && leftOpen && !generalNote, 'col-12' : fullleft && !generalNote,
+            'col-6' : !fullleft && !fullright && leftOpen && generalNote,
+            'col-8' : fullleft && generalNote, }">
+      <div class="resizable-container">
+        <div class="resizable" *ngIf="firstviewer" [@slideOutIn]
+          #resizableDiv>
+          <img *ngIf="fullleft" (click)="fullleftC()" class="leftFull cursor" src="assets/dsquareIcon/rightFull.png"
+            alt="" />
+          <div class="body">
+            <ng-container>
+
+              <nav ngbNav #nav2="ngbNav" [(activeId)]="active2" class="nav-tabs">
+
+                <ng-container *ngFor="let obj of bitstreamList" [ngbNavItem]="obj.bitstream.id">
+                  <a ngbNavLink class="1" *ngIf="obj.node.data && !obj.node.data.nonrepetitive">
+                    <span *ngIf="obj.node.parent">{{obj.node.parent.data.documentType.documenttypename}}</span>
+
+                    <span class="1"
+                      *ngIf="!obj.node.data.isSubchild && obj.node.data.desc ==null">{{obj.node.data.doc_date
+                      |
+                      date:'dd/MM/yyyy'}}</span>
+                    <span *ngIf="!obj.node.data.isSubchild && obj.node.data.desc !==null">{{' >>
+                      '+obj.node.data.desc}}</span>
+                    <span *ngIf="obj.node.data.isSubchild ">{{' >> '+obj.node.parent.data.desc +' >>
+                      '+obj.node.data.documentType.documenttypename}}</span>
+
+                    <span class="btn-close ms-2 fw-light" (click)="close($event, obj.bitstream.id)"><i
+                        class="fas ml-2 fa-times"></i></span>
+                  </a>
+
+                  <a ngbNavLink class="2" *ngIf="obj.node.data && obj.node.data.nonrepetitive">{{obj.node.data.desc}}
+                    <span class="btn-close ms-2 fw-light" (click)="close($event, obj.bitstream.id)"><i
+                        class="fas ml-2 fa-times"></i></span>
+                  </a>
+                  <ng-template ngbNavContent>
+                    <div *ngIf="!openPDFATFrstTime" style='width: 100%; height: 80vh'>
+
+                      <ds-pdf-viewer [pdfSrc]="obj.bitstream.href"></ds-pdf-viewer>
+                      <!-- <iframe #myiframe id='obj.id' #obj.id class='sticky-container' [src]="obj.bitstream.href"
+                            frameborder="0" width="100%" height="720px"></iframe> -->
+                    </div>
+
+                  </ng-template>
+
+                </ng-container>
+              </nav>
+              <div [ngbNavOutlet]="nav2" class="mt-2"></div>
+              <div class="default-pdf 1" *ngIf="openPDFATFrstTime && objbitstream!=null && !!objbitstream._links">
+                <a class="1" *ngIf="objbitstream.bundleName">
+                  <span class="1" *ngIf="objbitstream.bundleName">{{objbitstream.bundleName}}</span>
+                  <span class="btn-close ms-2 fw-light" style="cursor: pointer;" (click)="close($event, objbitstream.id,'fromdefault')"><i
+                    class="fas ml-2 fa-times"></i></span>
+                </a>
+              </div>
+              <div *ngIf="openPDFATFrstTime && objbitstream!=null && !!objbitstream._links"
+                style='width: 100%;'>
+                <!-- <ng2-pdfjs-viewer [openFile]="true" [pdfSrc]="objbitstream._links.content.href">
+                  </ng2-pdfjs-viewer> -->
+                <ds-pdf-viewer [pdfSrc]="objbitstream._links.content.href"></ds-pdf-viewer>
+              </div>
+            </ng-container>
+          </div>
+          <div class="resizer" *ngIf="secondviewer || thirdviewer" title="Set custom width by drag this icon"><i
+              class="fa-solid fa-left-right"></i></div>
+          <div class="reset-icon" *ngIf="secondviewer || thirdviewer" (click)="updateDivWidths()" title="Reset Width"><i
+              class="fa-solid fa-arrows-rotate"></i></div>
+        </div>
+        <div class="resizable" style="margin-left: 5px;" *ngIf="secondviewer" [@slideOutIn] #resizableDiv>
+
+          <div class="body">
+            <ng-container>
+              <nav ngbNav #nav3="ngbNav" [(activeId)]="active3" class="nav-tabs">
+                <ng-container *ngFor="let obj1 of bitstreamListsecond" [ngbNavItem]="obj1.bitstream.id">
+                  <a ngbNavLink *ngIf="obj1.node.data && !obj1.node.data.nonrepetitive"><span
+                      *ngIf="obj1.node.parent">{{obj1.node.parent.data.documentType.documenttypename}}</span>
+                    <span *ngIf="!obj1.node.data.isSubchild && obj1.node.data.desc ==null">{{obj1.node.data.doc_date |
+                      date:'dd/MM/yyyy'}}</span>
+                    <span *ngIf="!obj1.node.data.isSubchild && obj1.node.data.desc !==null">{{' >>
+                      '+obj1.node.data.desc}}</span>
+                    <span *ngIf="obj1.node.data.isSubchild && obj1.node.parent">{{' >> '+obj1.node.parent.data.desc +'
+                      >>
+                      '+obj1.node.data.documentType.documenttypename}}</span>
+                    <span *ngIf="obj1.node.data.isSubchild && !obj1.node.parent">{{
+                      obj1.node.data.documentType.documenttypename}}</span>
+
+                    <span class="btn-close ms-2 fw-light" (click)="closesecondview($event, obj1.bitstream.id)"><i
+                        class="fas ml-2 fa-times"></i></span>
+                  </a>
+                  <a ngbNavLink *ngIf="obj1.node.data && obj1.node.data.nonrepetitive">{{obj1.node.data.desc}}
+                    <span class="btn-close ms-2 fw-light" (click)="closesecondview($event, obj1.bitstream.id)"><i
+                        class="fas ml-2 fa-times"></i></span>
+                  </a>
+                  <ng-template ngbNavContent>
+                    <div style='width: 100%;'>
+                      <!-- <ng2-pdfjs-viewer [openFile]="true" [download]="false" [pdfSrc]="obj1.bitstream.href">
+                        </ng2-pdfjs-viewer> -->
+                      <ds-pdf-viewer [pdfSrc]="obj1.bitstream.href"></ds-pdf-viewer>
+                      <!-- <iframe #myiframe1 id='obj1.id' #obj.id class='sticky-container' [src]="obj1.bitstream.href"
+                            frameborder="0" width="100%" height="720px"></iframe> -->
+                    </div>
+                  </ng-template>
+                </ng-container>
+              </nav>
+              <div [ngbNavOutlet]="nav3" class="mt-2"></div>
+
+            </ng-container>
+          </div>
+          <div class="resizer" *ngIf="thirdviewer" title="Set custom width by drag this icon"><i
+              class="fa-solid fa-left-right"></i></div>
+          <div class="reset-icon" *ngIf="thirdviewer" (click)="updateDivWidths()" title="Reset Width"><i
+              class="fa-solid fa-arrows-rotate"></i></div>
+        </div>
+        <div class="resizable" style="margin-left: 5px;" *ngIf="thirdviewer" [@slideOutIn] #resizableDiv>
+
+          <div class="body">
+            <ng-container>
+              <nav ngbNav #nav4="ngbNav" [(activeId)]="active4" class="nav-tabs">
+                <ng-container *ngFor="let obj1 of bitstreamListthird" [ngbNavItem]="obj1.bitstream.id">
+                  <a ngbNavLink *ngIf="obj1.node.data && !obj1.node.data.nonrepetitive"><span
+                      *ngIf="obj1.node.parent">{{obj1.node.parent.data.documentType.documenttypename}}</span>
+                    <span *ngIf="!obj1.node.data.isSubchild && obj1.node.data.desc ==null">{{obj1.node.data.doc_date |
+                      date:'dd/MM/yyyy'}}</span>
+                    <span *ngIf="!obj1.node.data.isSubchild && obj1.node.data.desc !==null">{{' >>
+                      '+obj1.node.data.desc}}</span>
+                    <span *ngIf="obj1.node.data.isSubchild && obj1.node.parent">{{' >> '+obj1.node.parent.data.desc +'
+                      >>
+                      '+obj1.node.data.documentType.documenttypename}}</span>
+                    <span *ngIf="obj1.node.data.isSubchild && !obj1.node.parent">{{
+                      obj1.node.data.documentType.documenttypename}}</span>
+
+                    <span class="btn-close ms-2 fw-light" (click)="closethirdview($event, obj1.bitstream.id)"><i
+                        class="fas ml-2 fa-times"></i></span>
+                  </a>
+                  <a ngbNavLink *ngIf="obj1.node.data && obj1.node.data.nonrepetitive">{{obj1.node.data.desc}}
+                    <span class="btn-close ms-2 fw-light" (click)="closethirdview($event, obj1.bitstream.id)"><i
+                        class="fas ml-2 fa-times"></i></span>
+                  </a>
+                  <ng-template ngbNavContent>
+                    <div style='width: 100%;'>
+                      <!-- <ng2-pdfjs-viewer [openFile]="true" [download]="false" [pdfSrc]="obj1.bitstream.href">
+                        </ng2-pdfjs-viewer> -->
+                      <ds-pdf-viewer [pdfSrc]="obj1.bitstream.href"></ds-pdf-viewer>
+                      <!-- <iframe #myiframe1 id='obj1.id' #obj.id class='sticky-container' [src]="obj1.bitstream.href"
+                            frameborder="0" width="100%" height="720px"></iframe> -->
+                    </div>
+                  </ng-template>
+                </ng-container>
+              </nav>
+              <div [ngbNavOutlet]="nav4" class="mt-2"></div>
+
+            </ng-container>
+          </div>
+          <!-- <div class="resizer" *ngIf='generalNote'><i class="fa-solid fa-left-right"></i></div> -->
+        </div>
+      </div>
+    </div>
+    <div class="col-4" *ngIf='generalNote' style="border: 1px solid #80808038;
+        border-radius: 13px;
+        overflow: hidden;">
+      <div class="row main-haeder-picker" id="mydivheader" style="align-items: center;">
+        <div class="left-band" *ngIf="isSkatchpad">
+          <button class="color-picker" [ngClass]="penColor === '#ff0000' ? 'selected-pen' : ''"
+            style="background-color: red;height: 15px;border-radius: 9px;" (click)="setPenColor('#ff0000')"
+            title="Ink color"></button>
+          <button class="color-picker" [ngClass]="penColor === '#0000ff' ? 'selected-pen' : ''"
+            style="background-color: blue;height: 15px;border-radius: 9px; margin-left: 5px;margin-right: 5px;"
+            (click)="setPenColor('#0000ff')" title="Ink color"></button>
+          <button class="color-picker" [ngClass]="penColor === '#000000' ? 'selected-pen' : ''"
+            style="background-color: black;height: 15px;border-radius: 9px;" (click)="setPenColor('#000000')"
+            title="Ink color"></button>
+          <button class="btn eraser-btn" (click)="setPenColor('#ffffff')" title="Eraser"
+            [ngClass]="penColor === '#ffffff' ? 'selected-pen' : ''"><i class="fa-solid fa-eraser"
+              style="font-size: 25px;"></i></button>
+        </div>
+        <div class="right-band">
+          <!-- <div class="chekbox-band">
+            <label>Use Pen</label>
+            <input type="checkbox" data-toggle="switchbutton" [formControl]="sketchpadCheckBox"
+              (change)="usePenChangeEvent($event)" checked data-onstyle="primary">
+          </div> -->
+          <div class="chekbox-band">
+            <label>Sketchpad</label>
+            <input type="checkbox" data-toggle="switchbutton" [formControl]="sketchpadCheckBox"
+              (change)="sketchpadChangeEvent($event,content2)" checked data-onstyle="primary">
+          </div>
+          <button id="save-button" class="btn" (click)="generateGeneralNote()" title="Close"><i
+            class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+       
+      </div>
+      <div class="canvas" style='width: 100%;'>
+      <ds-canvas-manager  class="canvses" *ngIf="isSkatchpad" [noteInfo]="" [penColor]="penColor" [generalNote]="true"
+        [itemId]="itemTab.id" [eraserMode]="isEraser" [usePen]="usePen"></ds-canvas-manager>
+      </div>
+      <angular-editor *ngIf="!isSkatchpad" [formControl]="noteText" (input)="noteTextInput($event)"></angular-editor>
+    </div>
+    <div id="mydiv" class="col-4 smart-note" *ngIf='smartnote'>
+      <div class="row" id="mydivheader" style="align-items: center;">
+        <div class="col-4" style="margin-right: 8px;margin-top: 7px;">
+          <label>Sketchpad</label>
+          <input type="checkbox" data-toggle="switchbutton" [formControl]="sketchpadCheckBox"
+            (change)="sketchpadChangeEvent($event,content2)" checked data-onstyle="primary">
+        </div>
+        <div class="col-4" *ngIf="isSkatchpad">
+
+          <button class="color-picker" style="background-color: red;height: 15px;border-radius: 9px;"
+            (click)="setPenColor('#ff0000')" title="Ink color"></button>
+          <button class="color-picker"
+            style="background-color: blue;height: 15px;border-radius: 9px; margin-left: 5px;margin-right: 5px;"
+            (click)="setPenColor('#0000ff')" title="Ink color"></button>
+          <button class="color-picker" style="background-color: black;height: 15px;border-radius: 9px;"
+            (click)="setPenColor('#000000')" title="Ink color"></button>
+          <button class="btn" (click)="setPenColor('#ffffff')" title="Eraser"><i class="fa-solid fa-eraser"
+              style="font-size: 25px;"></i></button>
+          <!-- <button class="btn btn-primary" (click)="clearskatchpad()">Clear</button> -->
+
+          <!-- <button id="save-button" class="btn" (click)="genratesmartnote()" title="Close"><i class="fa-solid fa-xmark"></i></button> -->
+        </div>
+        <div class="col-3 d-flex justify-content-end">
+          <button id="save-button" class="btn" (click)="genratesmartnote()" title="Close"><i class="fa-solid fa-xmark"
+              style="font-size: 25px;"></i></button>
+        </div>
+      </div>
+      <ds-canvas-manager class="canvses" *ngIf="isSkatchpad" [noteInfo]="noteinfo" [penColor]="penColor"
+        [eraserMode]="isEraser" [generalNote]="false"></ds-canvas-manager>
+      <div>
+      </div>
+      <angular-editor *ngIf="!isSkatchpad" [formControl]="noteText" (input)="noteTextInput($event)"></angular-editor>
+    </div>
+  </div>
+</div>
+
+<ng-template #modalContent>
+  <div class="modal-header">
+    <h5 class="modal-title">Update Document</h5>
+    <button type="button" class="close" aria-label="Close" (click)="closePopup()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-6" *ngIf="this.editNode.data.isDate">
+        <div class="form-group">
+          <label> Date</label>
+          <input type="date" [(ngModel)]="datedoc" class="form-control" placeholder="DD/MM/YYYY">
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" [(ngModel)]="docdesc" class="form-control" placeholder="">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="closePopup()">Close</button>
+    <button type="button" class="btn btn-primary" (click)="updateNode()">Update</button>
+  </div>
+</ng-template>
+
+<ng-template #content2 let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title text-danger">Warning</h4>
+    <button type="button" id="delete_close" class="close" aria-label="Close" (click)="d('cancel')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>If you change note style it will delete previously added data. Do you want to continue?</p>
+  </div>
+  <div class="modal-footer">
+    <div class="btn-group mb-1">
+      <ul>
+        <li class="button" (click)="c('cancel')">
+          <a>{{'submission.general.discard.confirm.cancel' | translate}}</a>
+        </li>
+        <li class="red-bg button btn-danger" (click)="c('ok')">
+          <a>{{'submission.general.discard.confirm.submit' | translate}}</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #notepad let-c="close" let-d="dismiss">
+  <div>
+    <div class="row" id="mydivheader" style="align-items: center; margin: 0px;">
+      <div class="col-4" style="margin-right: 8px;margin-top: 7px;">
+        <label>Sketchpad</label>
+        <input type="checkbox" data-toggle="switchbutton" [formControl]="sketchpadCheckBox"
+          (change)="sketchpadChangeEvent($event,content2)" checked data-onstyle="primary">
+      </div>
+      <div class="col-4" *ngIf="isSkatchpad">
+
+        <button class="color-picker" style="background-color: red;height: 15px;border-radius: 9px;"
+          (click)="setPenColor('#ff0000')" title="Ink color"></button>
+        <button class="color-picker"
+          style="background-color: blue;height: 15px;border-radius: 9px; margin-left: 5px;margin-right: 5px;"
+          (click)="setPenColor('#0000ff')" title="Ink color"></button>
+        <button class="color-picker" style="background-color: black;height: 15px;border-radius: 9px;"
+          (click)="setPenColor('#000000')" title="Ink color"></button>
+        <button class="btn" (click)="setPenColor('#ffffff')" title="Eraser"><i class="fa-solid fa-eraser"
+            style="font-size: 25px;"></i></button>
+        <!-- <button class="btn btn-primary" (click)="clearskatchpad()">Clear</button> -->
+
+        <!-- <button id="save-button" class="btn" (click)="genratesmartnote()" title="Close"><i class="fa-solid fa-xmark"></i></button> -->
+      </div>
+      <div class="col-3 d-flex justify-content-end">
+        <button id="save-button" class="btn" (click)="c('ok')" title="Close"><i class="fa-solid fa-xmark"
+            style="font-size: 25px;"></i></button>
+      </div>
+    </div>
+    <!-- <div id="sketch-holder" #canvasContainer *ngIf="isSkatchpad" class="cursur-cus">
+  </div> -->
+    <ds-canvas-manager class="canvses" *ngIf="isSkatchpad" [noteInfo]="" [penColor]="penColor" [generalNote]="true" [itemId]="itemTab.id"
+      [eraserMode]="isEraser"></ds-canvas-manager>
+    <div>
+    </div>
+    <angular-editor *ngIf="!isSkatchpad" [formControl]="noteText" (input)="generalnoteTextInput($event)"></angular-editor>
+  </div>
+</ng-template>

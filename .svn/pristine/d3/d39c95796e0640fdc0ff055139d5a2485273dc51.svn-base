@@ -1,0 +1,330 @@
+{
+  "production": false,
+  "debug": true,
+  "ui": {
+    "ssl": false,
+    "host": "localhost",
+    "port": 4000,
+    "nameSpace": "/",
+    "rateLimiter": {
+      "windowMs": 60000,
+      "max": 500
+    },
+    "useProxies": true,
+    "baseUrl": "http://localhost:4000/"
+  },
+  "rest": {
+    "ssl": true,
+    "host": "lab.d2t.co",
+    "port": 443,
+    "nameSpace": "/ncrtcserver",
+    "baseUrl": "https://lab.d2t.co/ncrtcserver"
+  },
+  "actuators": {
+    "endpointPath": "/actuator/health"
+  },
+  "cache": {
+    "msToLive": {
+      "default": 900000
+    },
+    "control": "max-age=60",
+    "autoSync": {
+      "defaultTime": 0,
+      "maxBufferSize": 100,
+      "timePerMethod": {
+        "PATCH": 3
+      }
+    },
+    "serverSide": {
+      "debug": false,
+      "headers": [
+        "Link"
+      ],
+      "botCache": {
+        "max": 1000,
+        "timeToLive": 86400000,
+        "allowStale": true
+      },
+      "anonymousCache": {
+        "max": 0,
+        "timeToLive": 10000,
+        "allowStale": true
+      }
+    }
+  },
+  "auth": {
+    "ui": {
+      "timeUntilIdle": 900000,
+      "idleGracePeriod": 300000
+    },
+    "rest": {
+      "timeLeftBeforeTokenRefresh": 120000
+    }
+  },
+  "form": {
+    "spellCheck": true,
+    "validatorMap": {
+      "required": "required",
+      "regex": "pattern"
+    }
+  },
+  "notifications": {
+    "rtl": false,
+    "position": [
+      "top",
+      "right"
+    ],
+    "maxStack": 8,
+    "timeOut": 5000,
+    "clickToClose": true,
+    "animate": "scale"
+  },
+  "submission": {
+    "autosave": {
+      "metadata": [],
+      "timer": 0
+    },
+    "typeBind": {
+      "field": "dc.type"
+    },
+    "icons": {
+      "metadata": [
+        {
+          "name": "dc.author",
+          "style": "fas fa-user"
+        },
+        {
+          "name": "default",
+          "style": ""
+        }
+      ],
+      "authority": {
+        "confidence": [
+          {
+            "value": 600,
+            "style": "text-success"
+          },
+          {
+            "value": 500,
+            "style": "text-info"
+          },
+          {
+            "value": 400,
+            "style": "text-warning"
+          },
+          {
+            "value": "default",
+            "style": "text-muted"
+          }
+        ]
+      }
+    }
+  },
+  "defaultLanguage": "en",
+  "languages": [
+    {
+      "code": "en",
+      "label": "English",
+      "active": true
+    },
+    {
+      "code": "mr",
+      "label": "मराठी",
+      "active": true
+    }
+  ],
+  "browseBy": {
+    "oneYearLimit": 10,
+    "fiveYearLimit": 30,
+    "defaultLowerLimit": 1900,
+    "showThumbnails": true,
+    "pageSize": 20
+  },
+  "communityList": {
+    "pageSize": 20
+  },
+  "homePage": {
+    "titlelable": "National Capital Region Transport Corporation (NCRTC)",
+    "recentSubmissions": {
+      "pageSize": 5,
+      "sortField": "dc.date.accessioned"
+    },
+    "topLevelCommunityList": {
+      "pageSize": 5
+    }
+  },
+  "item": {
+    "edit": {
+      "undoTimeout": 10000
+    },
+    "showAccessStatuses": false,
+    "bitstream": {
+      "pageSize": 5
+    }
+  },
+  "collection": {
+    "edit": {
+      "undoTimeout": 10000
+    }
+  },
+  "themes": [
+    {
+      "name": "dspace",
+      "headTags": [
+        {
+          "tagName": "link",
+          "attributes": {
+            "rel": "icon",
+            "href": "assets/dspace/images/favicons/favicon.ico",
+            "sizes": "any"
+          }
+        },
+        {
+          "tagName": "link",
+          "attributes": {
+            "rel": "icon",
+            "href": "assets/dspace/images/favicons/favicon.svg",
+            "type": "image/svg+xml"
+          }
+        },
+        {
+          "tagName": "link",
+          "attributes": {
+            "rel": "apple-touch-icon",
+            "href": "assets/dspace/images/favicons/apple-touch-icon.png"
+          }
+        },
+        {
+          "tagName": "link",
+          "attributes": {
+            "rel": "manifest",
+            "href": "assets/dspace/images/favicons/manifest.webmanifest"
+          }
+        }
+      ]
+    }
+  ],
+  "bundle": {
+    "standardBundles": [
+      "ORIGINAL",
+      "THUMBNAIL",
+      "LICENSE"
+    ]
+  },
+  "mediaViewer": {
+    "image": false,
+    "video": false
+  },
+  "info": {
+    "enableEndUserAgreement": true,
+    "enablePrivacyStatement": true
+  },
+  "markdown": {
+    "enabled": false,
+    "mathjax": false
+  },
+  "vocabularies": [
+    {
+      "filter": "subject",
+      "vocabulary": "srsc",
+      "enabled": false
+    }
+  ],
+  "comcolSelectionSort": {
+    "sortField": "dc.title",
+    "sortDirection": "ASC"
+  },
+  "casetype": [
+    "A.APPL",
+    "A.B.A.",
+    "A.C.(D.B.)",
+    "A.C.(S.B.)",
+    "Acq. App.",
+    "Acq. App.(C)",
+    "Acq. App.(V)",
+    "Arb. Appeal",
+    "B.A.",
+    "C Ref",
+    "C.A.",
+    "C.M.P.",
+    "C.O.",
+    "C.P.",
+    "C.R.",
+    "C.Rev.",
+    "COM.APPEAL",
+    "COMP. APL.",
+    "Comp.Ap.DB",
+    "COMP.AP.SJ",
+    "Comp.Appeal",
+    "Cont.(Crl)",
+    "Cont.(Cvl)",
+    "CONT.APP.",
+    "Cop.Lnt",
+    "CR. EXE.",
+    "Cr. Ref.",
+    "Cr.A(DB)",
+    "Cr.A(SJ)",
+    "Cr.App(341)",
+    "Cr.App.(V)",
+    "Cr.M.P.",
+    "Cr.Misc.",
+    "Cr.Rev.",
+    "Cr.WJC",
+    "CrApp(U/S)",
+    "CWJC",
+    "D. Ref.",
+    "E.P.",
+    "FA",
+    "G.App.(DB)",
+    "G.App.(SJ)",
+    "L.A.",
+    "LPA",
+    "M A C CASE",
+    "MA",
+    "Mat Ref",
+    "Mat.Suit",
+    "MJC",
+    "Money SUIT",
+    "OCrMisc(DB",
+    "Or.Cr.Misc",
+    "PATENT CAS",
+    "PROB.CASE",
+    "Req. Case",
+    "REQ.APPEAL",
+    "S.C.L.P",
+    "SA",
+    "SCA",
+    "SLA",
+    "T.A.",
+    "T.S.",
+    "Tax",
+    "TAX APPLI.",
+    "Test Case",
+    "Test Suit",
+    "Tr.Pet.Crl",
+    "Tr.Pet.CVL",
+    "W.P.(Cr.)",
+    "WPC"
+  ],
+  "search": {
+    "advancedFilters": {
+      "enabled": true,
+      "filter": [
+        "title",
+        "CaseNature",
+        "PetitionerName",
+        "RespondentName",
+        "AdvocatePetitioner",
+        "AdvocateRespondent",
+        "FirDistrict",
+        "PoliceStation",
+        "FirNumber",
+        "FirYear",
+        "CaseType",
+        "CaseYear",
+        "JudgeName",
+        "categorisation"
+      ]
+    }
+  }
+}

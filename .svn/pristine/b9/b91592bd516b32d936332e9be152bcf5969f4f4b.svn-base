@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <base href="/">
+  <title id="titleID">Case file management</title>
+  <meta name="referrer" content="no-referrer-when-downgrade">
+  <meta name="viewport" content="width=device-width,minimum-scale=1">
+  <meta http-equiv="cache-control" content="no-store">
+  <style>
+    .bodybackgrocolr {
+  
+      background-image: url("../../assets/images/uhc.jpeg");
+      background-size: 100% 100%;
+      background-position: center;
+      height: 80%;
+      width: 100vw;
+     
+  
+    }
+  </style>
+</head>
+
+<body>
+  <ds-app></ds-app>
+</body>
+
+<!-- do not include client bundle, it is injected with Zone already loaded -->
+
+</html>

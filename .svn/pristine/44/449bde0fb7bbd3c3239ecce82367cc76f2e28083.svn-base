@@ -1,0 +1,42 @@
+.accordion .card-header:after {
+    font-family: 'FontAwesome';
+    content: '\f068';
+    float: right;
+  }
+  .accordion .card-header.collapsed:after {
+    content: '\f068';
+  }
+
+  .trim-info {
+    max-width: 100%;
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;  
+    line-height: 15px;
+    position: relative;
+ }
+ .pline-height{
+  line-height: 1;
+ }
+
+
+
+
+
+
+ //////////new css
+ .img-css{
+  height: 18px;
+}
+
+.title-css{
+color: #44B556;
+border-left: solid;
+border-color: #44B556;
+border-width: 5px;
+}
+
+a{
+color:  #474E8B
+}

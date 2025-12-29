@@ -1,0 +1,54 @@
+<!-- <ds-themed-home-news></ds-themed-home-news>
+<div class="container">
+  <ng-container *ngIf="(site$ | async) as site">
+    <ds-view-tracker [object]="site"></ds-view-tracker>
+  </ng-container>
+  <ds-themed-search-form [inPlaceSearch]="false" [searchPlaceholder]="'home.search-form.placeholder' | translate"></ds-themed-search-form>
+  <ds-themed-top-level-community-list></ds-themed-top-level-community-list>
+  <ds-recent-item-list *ngIf="recentSubmissionspageSize>0"></ds-recent-item-list>
+</div> -->
+
+<!-- <ds-themed-home-news></ds-themed-home-news> -->
+
+<div class="wrapper">
+  <ng-container *ngIf="(site$ | async) as site">
+    <ds-view-tracker [object]="site"></ds-view-tracker>
+  </ng-container>
+  <div class="backdrop">
+    <div class="container">
+      <div class="backbox">
+        <h3 class="searchcaption">Welcome to the Case Records Management System!- {{appConfig.homePage.titlelable | translate }}</h3>
+        <ds-search-form [inPlaceSearch]="false" [searchPlaceholder]="'home.search-form.placeholder' | translate">
+        </ds-search-form>
+      </div>
+      <div class="row">
+        <div class="form-group  col-lg-3">
+
+          <span class="text-white form-text">Case Type</span>
+          <input id="typeahead-basic" type="text" class=" form-control" [(ngModel)]="casetypesearch"
+            placeholder="Enter case type" [ngbTypeahead]="search" tabindex="1" />
+
+        </div>
+        <div class="form-group col-lg-3">
+          <span class="text-white form-text ">Case No</span>
+          <input type="text" [(ngModel)]="casenosearch" class="  form-control" placeholder="Enter case no"
+            tabindex="1" />
+        </div>
+        <div class="form-group col-lg-3">
+          <span class="text-white form-text ">Case Year</span>
+          <input type="text" [(ngModel)]="yearsearch" class="   form-control" placeholder="Enter case year"
+            tabindex="1" />
+        </div>
+        <div class="form-group col-lg-3">
+          <span class="text-white form-text "></span>
+          <input type="button" class=" btn mt-4 btn-primary mr-2" value="Search" (click)="findcrnByCaseTypenoyear()"
+            style="width: 90px;" tabindex="1">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- <div class="container">
+  <ds-top-level-community-list></ds-top-level-community-list>
+ 
+</div> -->

@@ -1,0 +1,129 @@
+rest:
+  ssl: true
+  host: lab.d2t.co
+  port: 443
+  nameSpace: /serverbdc
+
+
+casetype: ["A.APPL","A.B.A.","A.C.(D.B.)","A.C.(S.B.)","Acq. App.","Acq. App.(C)","Acq. App.(V)","Arb. Appeal","B.A.","C Ref","C.A.","C.M.P.","C.O.","C.P.","C.R.","C.Rev.","COM.APPEAL","COMP. APL.","Comp.Ap.DB","COMP.AP.SJ","Comp.Appeal","Cont.(Crl)","Cont.(Cvl)","CONT.APP.","Cop.Lnt","CR. EXE.","Cr. Ref.","Cr.A(DB)","Cr.A(SJ)","Cr.App(341)","Cr.App.(V)","Cr.M.P.","Cr.Misc.","Cr.Rev.","Cr.WJC","CrApp(U/S)","CWJC","D. Ref.","E.P.","FA","G.App.(DB)","G.App.(SJ)","L.A.","LPA","M A C CASE","MA","Mat Ref","Mat.Suit","MJC","Money SUIT","OCrMisc(DB","Or.Cr.Misc","PATENT CAS","PROB.CASE","Req. Case","REQ.APPEAL","S.C.L.P","SA","SCA","SLA","T.A.","T.S.","Tax","TAX APPLI.","Test Case","Test Suit","Tr.Pet.Crl","Tr.Pet.CVL","W.P.(Cr.)","WPC"]
+homePage:
+  titlelable: 'High Court of Uttarakhand'
+  recentSubmissions:
+    # The number of item showing in recent submission components
+    pageSize: 5
+    # Sort record of recent submission
+    sortField: 'dc.date.accessioned'
+  topLevelCommunityList:
+    # No. of communities to list per page on the home page
+    # This will always round to the nearest number from the list of page sizes. e.g. if you set it to 7 it'll use 10
+    pageSize: 5
+
+search: 
+  # Settings to enable/disable or configure advanced search filters.
+  advancedFilters:
+    enabled: true
+    # List of filters to enable in "Advanced Search" dropdown
+    filter: [ 'title', 'CaseNature','PetitionerName','RespondentName','AdvocatePetitioner','AdvocateRespondent','FirDistrict','PoliceStation','FirNumber','FirYear','CaseType', 'CaseYear', 'JudgeName', 'categorisation']
+
+
+# Theme Config
+themes:
+  # Add additional themes here. In the case where multiple themes match a route, the first one
+  # in this list will get priority. It is advisable to always have a theme that matches
+  # every route as the last one
+  #
+  # # A theme with a handle property will match the community, collection or item with the given
+  # # handle, and all collections and/or items within it
+  # - name: custom
+  #   handle: 10673/1233
+  #
+  # # A theme with a regex property will match the route using a regular expression. If it
+  # # matches the route for a community or collection it will also apply to all collections
+  # # and/or items within it
+  # - name: custom
+  #   regex: collections\/e8043bc2.*
+  #
+  # # A theme with a uuid property will match the community, collection or item with the given
+  # # ID, and all collections and/or items within it
+  # - name: custom
+  #   uuid: 0958c910-2037-42a9-81c7-dca80e3892b4
+  #
+  # # The extends property specifies an ancestor theme (by name). Whenever a themed component is not found
+  # # in the current theme, its ancestor theme(s) will be checked recursively before falling back to default.
+  # - name: custom-A
+  #   extends: custom-B
+  #   # Any of the matching properties above can be used
+  #   handle: 10673/34
+  #
+  # - name: custom-B
+  #   extends: custom
+  #   handle: 10673/12
+  #
+  # # A theme with only a name will match every route
+  # name: custom
+  #
+  # # This theme will use the default bootstrap styling for DSpace components
+  # - name: BASE_THEME_NAME
+  #
+  - name: dspace
+    headTags:
+    - tagName: link
+      attributes:
+        rel: icon
+        href: assets/dspace/images/favicons/favicon.ico
+        sizes: any
+        id: appFavicon
+    - tagName: link
+      attributes:
+        rel: icon
+        href: assets/dspace/images/favicons/favicon.svg
+        type: image/svg+xml
+    - tagName: link
+      attributes:
+        rel: apple-touch-icon
+        href: assets/dspace/images/favicons/apple-touch-icon.png
+    - tagName: link
+      attributes:
+        rel: manifest
+        href: assets/dspace/images/favicons/manifest.webmanifest
+
+# The default bundles that should always be displayed as suggestions when you upload a new bundle
+bundle:
+  standardBundles: [ ORIGINAL, THUMBNAIL, LICENSE ]
+
+# Whether to enable media viewer for image and/or video Bitstreams (i.e. Bitstreams whose MIME type starts with 'image' or 'video').
+# For images, this enables a gallery viewer where you can zoom or page through images.
+# For videos, this enables embedded video streaming
+mediaViewer:
+  image: false
+  video: false
+
+# Whether the end user agreement is required before users use the repository.
+# If enabled, the user will be required to accept the agreement before they can use the repository.
+# And whether the privacy statement should exist or not.
+info:
+  enableEndUserAgreement: true
+  enablePrivacyStatement: true
+
+# Whether to enable Markdown (https://commonmark.org/) and MathJax (https://www.mathjax.org/)
+# display in supported metadata fields. By default, only dc.description.abstract is supported.
+markdown:
+  enabled: false
+  mathjax: false
+
+# Which vocabularies should be used for which search filters
+# and whether to show the filter in the search sidebar
+# Take a look at the filter-vocabulary-config.ts file for documentation on how the options are obtained
+vocabularies:
+  - filter: 'subject'
+    vocabulary: 'srsc'
+    enabled: false
+
+# Default collection/community sorting order at Advanced search, Create/update community and collection when there are not a query. 
+comcolSelectionSort:
+  sortField: 'dc.title'
+  sortDirection: 'ASC'
+
+
+
+

@@ -1,0 +1,5 @@
+<div style='width: 100%; height: 99vh'>
+<ng2-pdfjs-viewer [openFile]="true" [download]="false" [pdfSrc]="path" >
+</ng2-pdfjs-viewer>
+</div>
+<!-- <iframe src="/assets/pdfjs/web/viewer.html?file=http://help.d2t.co:8080/jkserver/api/core/bitstreams/7ee44572-b823-4d57-895c-b1ef2f1a6ceb/content&item=OWP/300/2013"></iframe> -->

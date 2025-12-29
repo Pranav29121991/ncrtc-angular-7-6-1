@@ -1,0 +1,877 @@
+<div class="row mb-4" mb-10 *ngIf="itemTab.allMetadata(['casefile.*.*','casefile.*']).length > 0">
+  <div class="col-lg-6 text-center"><b>{{itemTab.firstMetadataValue('casefile.case.typename')}}/{{itemTab.firstMetadataValue('dc.title')}}/{{itemTab.firstMetadataValue('casefile.case.registrationyear')}}</b></div>
+  <div class="col-lg-6"><span *ngIf="caseStatus"class="badge " style="    font-size: 94% !important;" [ngClass]="classbager(caseStatus)">{{ caseStatus | translate }}</span>
+    <!-- <ds-dso-page-edit-button [pageRoute]="pageRoute" [dso]="itemTab" [tooltipMsg]="'item.page.edit'"></ds-dso-page-edit-button> -->
+
+    <!-- <ds-dso-edit-menu></ds-dso-edit-menu> -->
+  </div>
+</div>
+<div class="row" >
+  <div class="pr-1" style="    width: 95%;height: 560px; overflow: scroll;">
+      <ngb-accordion #accordion="ngbAccordion" activeIds="custom-panel-1" (panelChange)="beforeChange($event)">
+        <ngb-panel id="custom-panel-1">
+          <ng-template ngbPanelHeader let-opened="opened">
+            <div class="float-left accordion-button custom-header" [class.collapsed]="!opened">
+      
+              <button ngbPanelToggle class="p-0 btn  container-fluid text-start ps-0">
+                <img class="img-css" src="assets/dsquareIcon/order.svg" alt="" />
+                <b class="btn-link pline-height header-title ml-3 ">
+                  Basic Details
+                </b>
+              </button>
+            </div>
+          </ng-template>
+          <ng-template ngbPanelContent>
+      
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.case.typename') ">
+              <div>
+                <h6 class="font-weight-bold">Case Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('dc.title')}}"> {{itemTab.firstMetadataValue('dc.title')}}</span>
+      
+      
+            </div>
+      
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.case.status') ">
+              <div>
+                <h6 class="font-weight-bold">Case Status</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.case.status')}}">
+                {{itemTab.firstMetadataValue('casefile.case.status')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.case.EstablishmentName') ">
+              <div>
+                <h6 class="font-weight-bold">Establishment</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.case.EstablishmentName')}}">
+                {{itemTab.firstMetadataValue('casefile.case.EstablishmentName')}}</span>
+            </div>
+      
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.case.typename') ">
+              <div>
+                <h6 class="font-weight-bold">Case Type </h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.case.typename')}}">
+                {{itemTab.firstMetadataValue('casefile.case.typename')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.case.typecode') ">
+              <div>
+                <h6 class="font-weight-bold">Case Type Code </h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.case.typecode')}}">
+                {{itemTab.firstMetadataValue('casefile.case.typecode')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.case.number') ">
+              <div>
+                <h6 class="font-weight-bold">Case Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.case.number')}}">
+                {{itemTab.firstMetadataValue('casefile.case.number')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.case.registrationyear') ">
+              <div>
+                <h6 class="font-weight-bold">Case Year</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.case.registrationyear')}}">
+                {{itemTab.firstMetadataValue('casefile.case.registrationyear')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.case.NameOfHeadQuarter') ">
+              <div>
+                <h6 class="font-weight-bold">Headquarter Name </h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.case.NameOfHeadQuarter')}}">
+                {{itemTab.firstMetadataValue('casefile.case.NameOfHeadQuarter')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.case.NameOfTaluka') ">
+              <div>
+                <h6 class="font-weight-bold">Taluka</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.case.NameOfTaluka')}}">
+                {{itemTab.firstMetadataValue('casefile.case.NameOfTaluka')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.case.NameOfDistrict') ">
+              <div>
+                <h6 class="font-weight-bold">District</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.case.NameOfDistrict')}}">
+                {{itemTab.firstMetadataValue('casefile.case.NameOfDistrict')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.case.NameOfState') ">
+              <div>
+                <h6 class="font-weight-bold">State</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.case.NameOfState')}}">
+                {{itemTab.firstMetadataValue('casefile.case.NameOfState')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.judge.name') ">
+              <div>
+                <h6 class="font-weight-bold">Judge(s)</h6>
+              </div>
+              <span *ngFor="let judge of itemTab.allMetadataValues('casefile.judge.name'); let last=last;">
+                <a target="_blank" href="/browse/JudgeName?value={{judge }}"><span class="text-uppercase text-muted "
+                    data-toggle="tooltip" data-placement="top" title="{{judge}}" [innerHTML]="judge"></span></a> <br />
+              </span>
+      
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.judge.designation') ">
+              <div>
+                <h6 class="font-weight-bold">Judge's Designation</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.judge.designation')}}">
+                {{itemTab.firstMetadataValue('casefile.judge.designation')}}</span>
+            </div>
+            <div class="mt-2">
+      
+              <ds-related-items [parentItem]="itemTab" [relationType]="'ConnectedCaseOfCaseFile'"
+                [label]="'Connected Case(s)'">
+              </ds-related-items>
+              <ds-related-items [parentItem]="itemTab" [relationType]="'CaseFileOfMainCaseFile'" [label]="'Main Case'">
+              </ds-related-items>
+              <ds-related-items [parentItem]="itemTab" [relationType]="'subCaseFileOfMainCaseFile'" [label]="'Main Case'">
+              </ds-related-items>
+      
+      
+              <ds-related-items [parentItem]="itemTab" [relationType]="'CaseFileOfIACase'" [label]="'Main Case'">
+              </ds-related-items>
+              <ds-related-items [parentItem]="itemTab" [relationType]="'CaseFileOfCaveatCase'" [label]="'Main Case'">
+              </ds-related-items>
+              <div class="simple-view-element" *ngIf="IACase.length>0">
+                <h5 class="simple-view-element-header">IA Case(s)</h5>
+                <div class="simple-view-element-body" *ngFor="let iacase of IACase">
+                  <a target="_blank" class="ml-3 " href="handle/{{iacase.handle}}">
+                    {{iacase.firstMetadataValue('casefile.case.typename')}}/{{iacase.firstMetadataValue('dc.title')}}/{{iacase.firstMetadataValue('casefile.case.registrationyear')}}
+                  </a>
+                </div>
+      
+              </div>
+              <!-- <ds-related-items
+                    [parentItem]="itemTab"
+                    [relationType]="'IACaseOfCaseFile'"
+                    [label]="'IA Case(s)'">
+                </ds-related-items> -->
+              <ds-related-items [parentItem]="itemTab" [relationType]="'CaveatCaseOfCaseFile'" [label]="'Caveat Case(s)'">
+              </ds-related-items>
+            </div>
+      
+          </ng-template>
+        </ngb-panel>
+      
+        <ngb-panel *ngIf="itemTab.allMetadata(['casefile.petitioner.*']).length > 0">
+      
+          <ng-template ngbPanelHeader let-opened="opened">
+      
+            <div class="float-left accordion-button custom-header" [class.collapsed]="!opened">
+      
+              <button ngbPanelToggle class="p-0 btn  container-fluid text-start ps-0">
+                <img class="img-css" src="assets/dsquareIcon/Pleadings.svg" alt="" />
+                <b class="btn-link pline-height header-title ml-3 ">
+                  Petitioner's Details
+                </b>
+              </button>
+            </div>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.petitioner.id') ">
+              <div>
+                <h6 class="font-weight-bold">Petitioner ID</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.petitioner.id')}}">
+                {{itemTab.firstMetadataValue('casefile.petitioner.id')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.petitioner.serialnumber') ">
+              <div>
+                <h6 class="font-weight-bold">Petitioner's Serial Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.petitioner.serialnumber')}}">
+                {{itemTab.firstMetadataValue('casefile.petitioner.serialnumber')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.petitioner.name') ">
+              <div>
+                <h6 class="font-weight-bold">Petitioner Name</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.petitioner.name')}}">
+                {{itemTab.firstMetadataValue('casefile.petitioner.name')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.petitioner.gender') ">
+              <div>
+                <h6 class="font-weight-bold">Petitioner's Gender</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.petitioner.gender')}}">
+                {{itemTab.firstMetadataValue('casefile.petitioner.gender')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.petitioner.phonenumber') ">
+              <div>
+                <h6 class="font-weight-bold">Petitioner's Phone number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.petitioner.phonenumber')}}">
+                {{itemTab.firstMetadataValue('casefile.petitioner.phonenumber')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.petitioner.emailid') ">
+              <div>
+                <h6 class="font-weight-bold">Petitioner's email id</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.petitioner.emailid')}}">
+                {{itemTab.firstMetadataValue('casefile.petitioner.emailid')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.petitioner.address') ">
+              <div>
+                <h6 class="font-weight-bold">Petitioner's Address</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.petitioner.address')}}">
+                {{itemTab.firstMetadataValue('casefile.petitioner.address')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.petitioner.organization') ">
+              <div>
+                <h6 class="font-weight-bold">Petitioner's Organization Name</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.petitioner.organization')}}">
+                {{itemTab.firstMetadataValue('casefile.petitioner.organization')}}</span>
+            </div>
+      
+          </ng-template>
+        </ngb-panel>
+      
+        <ngb-panel *ngIf="itemTab.allMetadata(['casefile.respondent.*']).length > 0">
+      
+          <ng-template ngbPanelHeader let-opened="opened">
+      
+            <div class="float-left accordion-button custom-header" [class.collapsed]="!opened">
+      
+              <button ngbPanelToggle class="p-0 btn  container-fluid text-start ps-0">
+                <img class="img-css" src="assets/dsquareIcon/Applications.svg" alt="" />
+                <b class="btn-link pline-height header-title ml-3 ">
+                  Respondent's Details
+                </b>
+              </button>
+            </div>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.respondent.id') ">
+              <div>
+                <h6 class="font-weight-bold">Respondent ID</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.respondent.id')}}">
+                {{itemTab.firstMetadataValue('casefile.respondent.id')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.respondent.serialnumber') ">
+              <div>
+                <h6 class="font-weight-bold">Respondent's Serial Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.respondent.serialnumber')}}">
+                {{itemTab.firstMetadataValue('casefile.respondent.serialnumber')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.respondent.name') ">
+              <div>
+                <h6 class="font-weight-bold">Respondent Name</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.respondent.name')}}">
+                {{itemTab.firstMetadataValue('casefile.respondent.name')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.respondent.gender') ">
+              <div>
+                <h6 class="font-weight-bold">Respondent's Gender</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.respondent.gender')}}">
+                {{itemTab.firstMetadataValue('casefile.respondent.gender')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.respondent.phonenumber') ">
+              <div>
+                <h6 class="font-weight-bold">Respondent's Phone number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.respondent.phonenumber')}}">
+                {{itemTab.firstMetadataValue('casefile.respondent.phonenumber')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.respondent.emailid') ">
+              <div>
+                <h6 class="font-weight-bold">Respondent's email id</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.respondent.emailid')}}">
+                {{itemTab.firstMetadataValue('casefile.respondent.emailid')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.respondent.address') ">
+              <div>
+                <h6 class="font-weight-bold">Respondent's Address</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.respondent.address')}}">
+                {{itemTab.firstMetadataValue('casefile.respondent.address')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.respondent.organization') ">
+              <div>
+                <h6 class="font-weight-bold">Respondent's Organization Name</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.respondent.organization')}}">
+                {{itemTab.firstMetadataValue('casefile.respondent.organization')}}</span>
+            </div>
+      
+      
+          </ng-template>
+        </ngb-panel>
+      
+        <!--
+          
+            -->
+        <ngb-panel *ngIf="itemTab.allMetadata(['casefile.advocate.petitioner','casefile.advocate.respondent']).length > 0">
+      
+          <ng-template ngbPanelHeader let-opened="opened">
+      
+            <div class="float-left accordion-button custom-header" [class.collapsed]="!opened">
+      
+              <button ngbPanelToggle class="p-0 btn  container-fluid text-start ps-0">
+                <img class="img-css" src="assets/dsquareIcon/Office Notings.svg" alt="" />
+                <b class="btn-link pline-height header-title ml-3 ">
+                  Lawyer's Details
+                </b>
+              </button>
+            </div>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.advocate.petitioner') ">
+              <div>
+                <h6 class="font-weight-bold">Petitioner Advocate</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.allMetadataValues('casefile.advocate.petitioner')}}">{{itemTab.allMetadataValues('casefile.advocate.petitioner')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.advocate.respondent') ">
+              <div>
+                <h6 class="font-weight-bold">Respondent Advocate</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.allMetadataValues('casefile.advocate.respondent')}}">{{itemTab.allMetadataValues('casefile.advocate.respondent')}}</span>
+            </div>
+      
+      
+          </ng-template>
+        </ngb-panel>
+        <!---->
+        <ngb-panel *ngIf="itemTab.allMetadata(['casefile.case.cnrnumber', 'casefile.case.VirtualCourtCNR']).length > 0">
+      
+          <ng-template ngbPanelHeader let-opened="opened">
+      
+            <div class="float-left accordion-button custom-header" [class.collapsed]="!opened">
+              <button ngbPanelToggle class="p-0 btn  container-fluid text-start ps-0">
+                <img class="img-css" src="assets/dsquareIcon/Affidavits.svg" alt="" />
+                <b class="btn-link pline-height header-title ml-3 ">
+                  CNR Details</b>
+              </button>
+            </div>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.case.cnrnumber') ">
+              <div>
+                <h6 class="font-weight-bold">CNR Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.case.cnrnumber')}}">
+                {{itemTab.firstMetadataValue('casefile.case.cnrnumber')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.case.VirtualCourtCNR') ">
+              <div>
+                <h6 class="font-weight-bold">Virtual CNR Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.case.VirtualCourtCNR')}}">
+                {{itemTab.firstMetadataValue('casefile.case.VirtualCourtCNR')}}</span>
+            </div>
+      
+          </ng-template>
+        </ngb-panel>
+      
+      
+        <!---->
+        <ngb-panel
+          *ngIf="itemTab.allMetadata(['casefile.act.info','casefile.act.section','casefile.case.nature','casefile.case.registrationnumber', 'casefile.case.registrationdate', 'casefile.case.FilingNumber','casefile.case.FilingDate','casefile.efiling.number','casefile.efiling.date','casefile.efiling.year','casefile.efiling.type']).length > 0">
+      
+          <ng-template ngbPanelHeader let-opened="opened">
+      
+            <div class="float-left accordion-button custom-header" [class.collapsed]="!opened">
+              <button ngbPanelToggle class="p-0 btn  container-fluid text-start ps-0">
+                <img class="img-css" src="assets/dsquareIcon/Compilance-Status-Reports.svg" alt="" />
+                <b class="btn-link pline-height header-title ml-3 ">
+                  Other Details</b>
+              </button>
+            </div>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.case.registrationnumber') ">
+              <div>
+                <h6 class="font-weight-bold">Registration Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.case.registrationnumber')}}">
+                {{itemTab.firstMetadataValue('casefile.case.registrationnumber')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.case.registrationdate') ">
+              <div>
+                <h6 class="font-weight-bold">Registration Date</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.case.registrationdate')}}">
+                {{itemTab.firstMetadataValue('casefile.case.registrationdate') | translate | date: 'dd/MM/yyyy'}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.case.FilingNumber') ">
+              <div>
+                <h6 class="font-weight-bold">Filing Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.case.FilingNumber')}}">
+                {{itemTab.firstMetadataValue('casefile.case.FilingNumber')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.case.FilingDate') ">
+              <div>
+                <h6 class="font-weight-bold">Date of Filing</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.case.FilingDate')}}">
+                {{itemTab.firstMetadataValue('casefile.case.FilingDate')| translate | date: 'dd/MM/yyyy'}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.efiling.number') ">
+              <div>
+                <h6 class="font-weight-bold">E-Filing Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.efiling.number')}}">
+                {{itemTab.firstMetadataValue('casefile.efiling.number')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.efiling.date') ">
+              <div>
+                <h6 class="font-weight-bold">E-Filing Date</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.efiling.date')}}">
+                {{itemTab.firstMetadataValue('casefile.efiling.date')| translate | date: 'dd/MM/yyyy'}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.efiling.year') ">
+              <div>
+                <h6 class="font-weight-bold">E-Filing Year</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.efiling.year')}}">
+                {{itemTab.firstMetadataValue('casefile.efiling.year')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.efiling.type') ">
+              <div>
+                <h6 class="font-weight-bold">E-Filing Type</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.efiling.type')}}">
+                {{itemTab.firstMetadataValue('casefile.efiling.type')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.case.nature') ">
+              <div>
+                <h6 class="font-weight-bold">Case Nature</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.case.nature')}}">
+                {{itemTab.firstMetadataValue('casefile.case.nature')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.act.info') ">
+              <div>
+                <h6 class="font-weight-bold">Act</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.act.info')}}">
+                {{itemTab.firstMetadataValue('casefile.act.info')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.act.section') ">
+              <div>
+                <h6 class="font-weight-bold">Act section</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.act.section')}}">
+                {{itemTab.firstMetadataValue('casefile.act.section')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.handle ">
+              <div>
+                <h6 class="font-weight-bold">URI</h6>
+              </div>
+              <span class="" data-toggle="tooltip" data-placement="top">
+                <a target="_blank" href="handle/{{itemTab.handle}}">{{itemTab.handle}}</a>
+              </span>
+            </div>
+          </ng-template>
+        </ngb-panel>
+      
+        <!---->
+        <ngb-panel *ngIf="itemTab.allMetadata([ 'casefile.status.*']).length > 0">
+      
+          <ng-template ngbPanelHeader let-opened="opened">
+      
+            <div class="float-left accordion-button custom-header" [class.collapsed]="!opened">
+              <button ngbPanelToggle class="p-0 btn  container-fluid text-start ps-0">
+                <img class="img-css" src="assets/dsquareIcon/Miscellaneous.svg" alt="" />
+                <b class="btn-link pline-height header-title ml-3 ">
+                  Status</b>
+              </button>
+            </div>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.status.dateofdisposal') ">
+              <div>
+                <h6 class="font-weight-bold">Disposal Date</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.status.dateofdisposal')}}">
+                {{itemTab.firstMetadataValue('casefile.status.dateofdisposal') | translate | date: 'dd/MM/yyyy'}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.status.disposaltype') ">
+              <div>
+                <h6 class="font-weight-bold">Disposal Type</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.status.disposaltype')}}">
+                {{itemTab.firstMetadataValue('casefile.status.disposaltype')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.status.purpose') ">
+              <div>
+                <h6 class="font-weight-bold">Disposal Purpose</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.status.purpose')}}">
+                {{itemTab.firstMetadataValue('casefile.status.purpose')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.status.subpurpose') ">
+              <div>
+                <h6 class="font-weight-bold">Disposal Sub-purpose</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.status.subpurpose')}}">
+                {{itemTab.firstMetadataValue('casefile.status.subpurpose')}}</span>
+            </div>
+      
+          </ng-template>
+        </ngb-panel>
+      
+        <!---->
+        <ngb-panel *ngIf="itemTab.allMetadata(['casefile.order.*']).length > 0">
+      
+          <ng-template ngbPanelHeader let-opened="opened">
+      
+            <div class="float-left accordion-button custom-header" [class.collapsed]="!opened">
+              <button ngbPanelToggle class="p-0 btn  container-fluid text-start ps-0">
+                <img class="img-css" src="assets/dsquareIcon/Applications.svg" alt="" />
+                <b class="btn-link pline-height header-title ml-3 ">
+                  Order Details</b>
+              </button>
+            </div>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.order.date') ">
+              <div>
+                <h6 class="font-weight-bold">Order Date</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.order.date')}}">
+                {{itemTab.firstMetadataValue('casefile.order.date') | translate | date: 'dd/MM/yyyy'}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.order.judgementdate') ">
+              <div>
+                <h6 class="font-weight-bold">Judgment Date</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.order.judgementdate')}}">
+                {{itemTab.firstMetadataValue('casefile.order.judgementdate') | translate | date: 'dd/MM/yyyy'}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.order.type') ">
+              <div>
+                <h6 class="font-weight-bold">Order Type</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.order.type')}}">
+                {{itemTab.firstMetadataValue('casefile.order.type')}}</span>
+            </div>
+          </ng-template>
+        </ngb-panel>
+      
+        <!---->
+        <ngb-panel *ngIf="itemTab.allMetadata([ 'casefile.caveat.*']).length > 0">
+      
+          <ng-template ngbPanelHeader let-opened="opened">
+      
+            <div class="float-left accordion-button custom-header" [class.collapsed]="!opened">
+              <button ngbPanelToggle class="p-0 btn  container-fluid text-start ps-0">
+                <img class="img-css" src="assets/dsquareIcon/Pleadings.svg" alt="" />
+                <b class="btn-link pline-height header-title ml-3 ">
+                  Caveat Details</b>
+              </button>
+            </div>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.caveat.caveateename') ">
+              <div>
+                <h6 class="font-weight-bold">Caveat Name</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.caveat.caveateename')}}">
+                {{itemTab.firstMetadataValue('casefile.caveat.caveateename')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.caveat.caveatnumber') ">
+              <div>
+                <h6 class="font-weight-bold">Caveat Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.caveat.caveatnumber')}}">
+                {{itemTab.firstMetadataValue('casefile.caveat.caveatnumber')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.caveat.caveateeserialnumber') ">
+              <div>
+                <h6 class="font-weight-bold">Caveat Serial Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.caveat.caveateeserialnumber')}}">
+                {{itemTab.firstMetadataValue('casefile.caveat.caveateeserialnumber')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.caveat.caveatorname') ">
+              <div>
+                <h6 class="font-weight-bold">Caveator's Name</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.caveat.caveatorname')}}">
+                {{itemTab.firstMetadataValue('casefile.caveat.caveatorname')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.caveat.caveatorserialnumber') ">
+              <div>
+                <h6 class="font-weight-bold">Caveator's Serial Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.caveat.caveatorserialnumber')}}">
+                {{itemTab.firstMetadataValue('casefile.caveat.caveatorserialnumber')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.caveat.registrationdate') ">
+              <div>
+                <h6 class="font-weight-bold">Registration Date</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.caveat.registrationdate')}}">
+                {{itemTab.firstMetadataValue('casefile.caveat.registrationdate') | translate | date: 'dd/MM/yyyy'}}</span>
+            </div>
+          </ng-template>
+        </ngb-panel>
+      
+        <!---->
+        <ngb-panel *ngIf="itemTab.allMetadata(['casefile.fir.*']).length > 0">
+      
+          <ng-template ngbPanelHeader let-opened="opened">
+      
+            <div class="float-left accordion-button custom-header" [class.collapsed]="!opened">
+              <button ngbPanelToggle class="p-0 btn  container-fluid text-start ps-0">
+                <img class="img-css" src="assets/dsquareIcon/Office Notings.svg" alt="" />
+                <b class="btn-link pline-height header-title ml-3 ">
+                  FIR Details</b>
+              </button>
+            </div>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.fir.number') ">
+              <div>
+                <h6 class="font-weight-bold">FIR Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.fir.number')}}">
+                {{itemTab.firstMetadataValue('casefile.fir.number')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.fir.date') ">
+              <div>
+                <h6 class="font-weight-bold">FIR Date</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.fir.date')}}"> {{itemTab.firstMetadataValue('casefile.fir.date')
+                | translate | date: 'dd/MM/yyyy'}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.fir.year') ">
+              <div>
+                <h6 class="font-weight-bold">FIR Year</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.fir.year')}}">
+                {{itemTab.firstMetadataValue('casefile.fir.year')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.fir.chargesheetnumber') ">
+              <div>
+                <h6 class="font-weight-bold">Chargesheet Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.fir.chargesheetnumber')}}">
+                {{itemTab.firstMetadataValue('casefile.fir.chargesheetnumber')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.fir.chargesheetdate') ">
+              <div>
+                <h6 class="font-weight-bold">Chargesheet Date</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.fir.chargesheetdate')}}">
+                {{itemTab.firstMetadataValue('casefile.fir.chargesheetdate') | translate | date: 'dd/MM/yyyy'}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.fir.policestationname') ">
+              <div>
+                <h6 class="font-weight-bold">Police Station Name</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.fir.policestationname')}}">
+                {{itemTab.firstMetadataValue('casefile.fir.policestationname')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.fir.policestationcode') ">
+              <div>
+                <h6 class="font-weight-bold">Police Station Code</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.fir.policestationcode')}}">
+                {{itemTab.firstMetadataValue('casefile.fir.policestationcode')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.fir.tehsil') ">
+              <div>
+                <h6 class="font-weight-bold">Police Station Tehsil</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.fir.tehsil')}}">
+                {{itemTab.firstMetadataValue('casefile.fir.tehsil')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.fir.taluka') ">
+              <div>
+                <h6 class="font-weight-bold">Police Station Taluka</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.fir.taluka')}}">
+                {{itemTab.firstMetadataValue('casefile.fir.taluka')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.fir.district') ">
+              <div>
+                <h6 class="font-weight-bold">Police Station District</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.fir.district')}}">
+                {{itemTab.firstMetadataValue('casefile.fir.district')}}</span>
+            </div>
+      
+          </ng-template>
+        </ngb-panel>
+      
+        <!---->
+        <ngb-panel *ngIf="itemTab.allMetadata([ 'casefile.oldcase.*']).length > 0">
+      
+          <ng-template ngbPanelHeader let-opened="opened">
+      
+            <div class="float-left accordion-button custom-header" [class.collapsed]="!opened">
+              <button ngbPanelToggle class="p-0 btn  container-fluid text-start ps-0">
+                <img class="img-css" src="assets/dsquareIcon/Applications.svg" alt="" />
+                <b class="btn-link pline-height header-title ml-3 ">
+                  Old Case Details</b>
+              </button>
+            </div>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.oldcase.casenumber') ">
+              <div>
+                <h6 class="font-weight-bold">Old Case Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.oldcase.casenumber')}}">
+                {{itemTab.firstMetadataValue('casefile.oldcase.casenumber')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.oldcase.cnrnumber') ">
+              <div>
+                <h6 class="font-weight-bold">Old Case CNR Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.oldcase.cnrnumber')}}">
+                {{itemTab.firstMetadataValue('casefile.oldcase.cnrnumber')}}</span>
+            </div>
+      
+          </ng-template>
+        </ngb-panel>
+      
+        <!-- Record Room Details-->
+        <ngb-panel *ngIf="itemTab.allMetadata([ 'casefile.recordroom.*']).length > 0">
+      
+          <ng-template ngbPanelHeader let-opened="opened">
+      
+            <div class="float-left accordion-button custom-header" [class.collapsed]="!opened">
+              <button ngbPanelToggle class="p-0 btn  container-fluid text-start ps-0">
+                <img class="img-css" src="assets/dsquareIcon/Compilance-Status-Reports.svg" alt="" />
+                <b class="btn-link pline-height header-title ml-3 ">
+                  Record Room Details</b>
+              </button>
+            </div>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.recordroom.blockno') ">
+              <div>
+                <h6 class="font-weight-bold">Block Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.recordroom.blockno')}}">
+                {{itemTab.firstMetadataValue('casefile.recordroom.blockno')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.recordroom.roomno') ">
+              <div>
+                <h6 class="font-weight-bold">Room Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.recordroom.roomno')}}">
+                {{itemTab.firstMetadataValue('casefile.recordroom.roomno')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.recordroom.almirano') ">
+              <div>
+                <h6 class="font-weight-bold">Almirah Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.recordroom.almirano')}}">
+                {{itemTab.firstMetadataValue('casefile.recordroom.almirano')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.recordroom.rackno') ">
+              <div>
+                <h6 class="font-weight-bold">Rack Number</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.recordroom.rackno')}}">
+                {{itemTab.firstMetadataValue('casefile.recordroom.rackno')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.recordroom.dateofreceipt') ">
+              <div>
+                <h6 class="font-weight-bold">Date of Receipt</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.recordroom.dateofreceipt')}}">
+                {{itemTab.firstMetadataValue('casefile.recordroom.dateofreceipt') | translate | date: 'dd/MM/yyyy'}}</span>
+            </div>
+            <div class="mt-2" *ngIf="itemTab.firstMetadataValue('casefile.recordroom.briefjudgment') ">
+              <div>
+                <h6 class="font-weight-bold">Brief Judgment</h6>
+              </div>
+              <span class="text-uppercase " data-toggle="tooltip" data-placement="top"
+                title="{{itemTab.firstMetadataValue('casefile.recordroom.dateofreceipt')}}">
+                {{itemTab.firstMetadataValue('casefile.recordroom.dateofreceipt')}}</span>
+            </div>
+          </ng-template>
+        </ngb-panel>
+      </ngb-accordion>
+  </div>
+</div>

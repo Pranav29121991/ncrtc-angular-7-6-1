@@ -1,0 +1,23 @@
+canvas {
+    border: 1px solid #000;
+  }
+
+  .eraser-cursor {
+    // cursor: crosshair; /* This will show a crosshair cursor */
+    cursor: url('../../../../assets/images/imresizer-1717659493852.png'), auto!important;
+  }
+
+  .pencil-cursor {
+    // cursor: crosshair; /* This will show a crosshair cursor */
+    cursor:  url('../../../../assets/images/imresizer-1717657155188.png'),auto!important;
+  }
+
+  .scroll-container {
+    height: 68vh; /* Adjust as needed */
+    overflow-y: auto;
+  }
+
+  .scroll-container1 {
+    height: 80vh; /* Adjust as needed */
+    overflow-y: auto;
+  }

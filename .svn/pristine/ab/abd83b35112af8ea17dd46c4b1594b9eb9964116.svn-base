@@ -1,0 +1,26 @@
+tree-viewport {
+    display: grid !important;
+    overflow-y: hidden !important;  
+    & div:first-child {
+      & div:first-child {
+        height: 100% !important;
+        word-wrap: break-word !important;
+        white-space: nowrap !important;
+      }
+    }
+  }
+  .node-content-wrapper-focused {
+     background: #0000; 
+  }
+
+  .container {
+    position: relative;
+  }
+  
+  .draggable-row {
+    position: absolute;
+    cursor: pointer;
+    top: 50px; /* Adjust the top position as needed */
+    left: 50px; /* Adjust the left position as needed */
+    z-index: 1000; /* Ensure the draggable div is above other elements */
+  }

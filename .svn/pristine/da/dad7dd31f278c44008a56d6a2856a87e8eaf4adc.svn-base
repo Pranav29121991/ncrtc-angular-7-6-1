@@ -1,0 +1,108 @@
+<ds-type-badge *ngIf="showLabel" [object]="dso"></ds-type-badge>
+<div class="row">
+  <div class="col-lg-10">
+    <ds-truncatable [id]="dso.id" *ngIf="object !== undefined && object !== null">
+      <div class="mt-2" *ngIf="dso.firstMetadataValue('casefile.case.typename')">
+        <a *ngIf="linkType != linkTypes.None" [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'"
+          rel="noopener noreferrer" [routerLink]="[itemPageRoute]"
+          class="lead item-list-title dont-break-out">{{dsoTitle}}</a>
+        <span *ngIf="linkType == linkTypes.None" class="lead item-list-title dont-break-out" [innerHTML]="dsoTitle"></span>
+      </div>
+      <div class="mt-2" *ngIf="dso.firstMetadataValue('causelist.date')">
+        <a *ngIf="linkType != linkTypes.None" [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'"
+          rel="noopener noreferrer" [routerLink]="[itemPageRoute]"
+          class="lead item-list-title dont-break-out">{{firstMetadataValue('causelist.date') | translate | date:
+          'dd/MM/yyyy' }}</a>
+        <span *ngIf="linkType == linkTypes.None" class="lead item-list-title dont-break-out"
+          [innerHTML]="firstMetadataValue('causelist.date')"></span>
+      </div>
+    
+    
+      <div class="mb-1">
+        <ng-container *ngIf="dso.firstMetadataValue('causelist.bench.code') ">
+          <span class="text-uppercase text-muted">{{firstMetadataValue('causelist.bench.code')}}</span>
+        </ng-container>
+      </div>
+    
+      <div class="mb-1">
+        <ng-container *ngIf="dso.allMetadata('casefile.judge.name').length > 0 ">
+          <span *ngFor="let judge of allMetadataValues('casefile.judge.name'); let last=last;">
+            <a routerLink="/browse/JudgeName" [queryParams]="{value: judge}" routerLinkActive="active"><span
+                class="text-uppercase text-muted trim-info" data-toggle="tooltip" data-placement="top"
+                title="{{judge}}">{{judge }}</span></a>
+            <span class=" h4 font-weight-bold" *ngIf="!last">|</span>
+          </span>
+        </ng-container>
+      </div>
+    
+    
+    
+      <div class="mb-1"
+        *ngIf="dso.firstMetadataValue('casefile.petitioner.name') || dso.firstMetadataValue('casefile.respondent.name')">
+        <b class="text-uppercase">
+          {{dso.firstMetadataValue('casefile.petitioner.name')}} <i class="text-capitalize">Vs</i>
+          {{dso.firstMetadataValue('casefile.respondent.name')}}
+        </b>
+      </div>
+      <div class="mb-1">
+        <b *ngIf="dso.allMetadata('casefile.advocate.petitioner').length > 0"> Petitioner Advocate: <span
+            class=" ml-2  text-uppercase">{{allMetadataValues('casefile.advocate.petitioner') }}</span></b>
+        <b class="ml-2 " *ngIf="dso.allMetadata('casefile.advocate.respondent').length > 0">Respondent Advocate: <span
+            class=" ml-2 text-uppercase">{{allMetadataValues('casefile.advocate.respondent') }}</span></b>
+      </div>
+    </ds-truncatable>
+    </div>
+    <div class="col-lg-2">
+      <qrcode [qrdata]="getURLfrom()" [width]="100" [errorCorrectionLevel]="'M'"></qrcode>
+    </div>
+    </div>
+
+
+
+
+<!-- <div class="row">
+  <div *ngIf="showThumbnails" class="col-3 col-md-2">
+    <a *ngIf="linkType != linkTypes.None" [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'" [attr.rel]="(linkType == linkTypes.ExternalLink) ? 'noopener noreferrer' : null"
+       [routerLink]="[itemPageRoute]" class="dont-break-out">
+    <ds-thumbnail [thumbnail]="dso?.thumbnail | async" [limitWidth]="true">
+    </ds-thumbnail>
+    </a>
+    <span *ngIf="linkType == linkTypes.None" class="dont-break-out">
+    <ds-thumbnail [thumbnail]="dso?.thumbnail | async" [limitWidth]="true">
+    </ds-thumbnail>
+    </span>
+  </div>
+  <div [ngClass]="showThumbnails ? 'col-9' : 'col-md-12'">
+    <div class="d-flex">
+      <ds-themed-badges *ngIf="showLabel" [object]="dso" [context]="context" [showAccessStatus]="true"></ds-themed-badges>
+    </div>
+
+    <ds-truncatable [id]="dso.id" *ngIf="object !== undefined && object !== null">
+      <a *ngIf="linkType != linkTypes.None" [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'" [attr.rel]="(linkType == linkTypes.ExternalLink) ? 'noopener noreferrer' : null"
+         [routerLink]="[itemPageRoute]" class="lead item-list-title dont-break-out"
+         [innerHTML]="dsoTitle"></a>
+      <span *ngIf="linkType == linkTypes.None" class="lead item-list-title dont-break-out"
+            [innerHTML]="dsoTitle"></span>
+      <span class="text-muted">
+        <ds-truncatable-part [id]="dso.id" [minLines]="1">
+          <ng-container *ngIf="dso.firstMetadataValue('dc.publisher') || dso.firstMetadataValue('dc.date.issued')">
+            (<span *ngIf="dso.firstMetadataValue('dc.publisher')" class="item-list-publisher" [innerHTML]="firstMetadataValue('dc.publisher')"></span>
+            <span *ngIf="dso.firstMetadataValue('dc.publisher') && dso.firstMetadataValue('dc.date.issued')">, </span>
+          <span *ngIf="dso.firstMetadataValue('dc.date.issued')" class="item-list-date" [innerHTML]="firstMetadataValue('dc.date.issued')"></span>)
+          </ng-container>
+          <span *ngIf="dso.allMetadata(['dc.contributor.author', 'dc.creator', 'dc.contributor.*']).length > 0" class="item-list-authors">
+            <span *ngFor="let author of allMetadataValues(['dc.contributor.author', 'dc.creator', 'dc.contributor.*']); let last=last;">
+                <span [innerHTML]="author"><span [innerHTML]="author"></span></span>
+                <span *ngIf="!last">; </span>
+            </span>
+          </span>
+        </ds-truncatable-part>
+      </span>
+      <div *ngIf="dso.firstMetadataValue('dc.description.abstract')" class="item-list-abstract">
+        <ds-truncatable-part [id]="dso.id" [minLines]="3"><span
+          [innerHTML]="firstMetadataValue('dc.description.abstract')"></span>
+        </ds-truncatable-part>
+      </div>
+    </ds-truncatable>
+  </div>
+</div> -->

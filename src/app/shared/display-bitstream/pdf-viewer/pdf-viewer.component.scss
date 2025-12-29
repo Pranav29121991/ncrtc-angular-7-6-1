@@ -1,0 +1,460 @@
+#mydivheader {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: white; /* Ensure the header has a background color to cover content below it */
+    border-bottom: 1px solid #ccc; /* Optional: Add a border to separate the header from the content */
+    padding: 7px 0px; /* Adjust padding as needed */
+}
+
+.main-haeder-picker{
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: #e1e1e13d;
+    border-bottom: 1px solid #ccc;
+    padding: 0px;
+    height: auto;
+    display: flex !important;
+    justify-content: space-between !important;
+  }
+  .left-band {
+      margin-left: 13px;
+      display: flex;
+      align-items: center;
+  }
+  .left-band button.color-picker {
+      width: 17px !important;
+      height: 17px !important;
+      border: 0px;
+      border: 2px solid #fff;
+      box-shadow: 0px 4px 10px #0000001c;
+  }
+  .eraser-btn {
+      padding: 0;
+      margin-left: 15px;
+      display: flex;
+  }
+  .right-band {
+      display: flex;
+      align-items: center;
+      margin-right: 13px;
+  }
+  .chekbox-band {
+      float: right;
+      display: flex;
+      align-items: center;
+      background-color: white;
+      width: fit-content !important;
+      justify-content: center;
+      padding: 2px 8px;
+      border: 1px solid #eee;
+      border-radius: 7px;
+  }
+  .chekbox-band label {
+      margin: 0;
+      margin-right: 10px;
+  }
+  button#save-button {
+      padding-right: 0;
+      display: flex;
+  }
+  .main-haeder-picker .btn i {
+      font-size: 21px;
+      color: #181818ad;
+  }
+
+  .canvas {
+    display: block;
+    overflow: auto;
+    // max-height: 75vh;
+    scrollbar-width: thin;
+}
+
+.selected-pen {
+    border: 2px solid gray!important;
+}
+  @include media-breakpoint-down(md) {
+  .container {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+pdf-viewer {
+  display: block;
+  height: 100vh;
+}
+.card-body {
+    -webkit-box-flex: 1;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding: 0.25rem;
+}
+// .ng-star-inserted{
+//     height: 100%;
+// }
+.container {
+  border: 1px solid black;
+  display: grid;
+  grid-template-rows: auto calc(100vh - 38.4px); // StackBlitz adds 8px padding to body and 'First div' has a height of 22.4px (8 + 8 + 22.4 = 38.4px).
+}
+.close {
+  font-size: 1.4rem;
+  opacity: 0.1;
+  transition: opacity 0.3s;
+}
+.nav-link:hover > .close {
+  opacity: 0.8;
+}
+.spanclik{
+  cursor: pointer;
+  color: #207698;
+}
+.spanclik:hover {
+  text-decoration: underline;
+}
+.trim-info {
+  max-width: 100%;
+  display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;  
+  line-height: 15px;
+  position: relative;
+}
+/*
+new layout css blow
+*/
+.img-css {
+  height: 20px;
+}
+
+.title-css {
+  color: #44b556;
+  border-left: solid;
+  border-color: #44b556;
+  border-width: 5px;
+}
+
+a {
+  color: #474e8b;
+}
+
+.leftArrow {
+  position: fixed;
+  height: 20vh;
+  z-index: 5;
+  top: 40%;
+  margin-left: 1%;
+}
+
+.rightArrow {
+  position: fixed;
+  height: 20vh;
+  z-index: 5;
+  top: 70%;
+  margin-left: 1%;
+}
+
+.leftFull {
+  position: fixed;
+  height: 50vh;
+  z-index: 5;
+  width: 15px;
+  top: 40%;
+}
+
+.rightFull {
+  right: 0;
+  position: fixed;
+  height: 50vh;
+  z-index: 5;
+  width: 15px;
+  top: 15%;
+}
+
+.example-container {
+  width: 500px;
+  height: 300px;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.example-sidenav-content {
+  display: flex;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.example-sidenav {
+  padding: 20px;
+}
+.rowEcourt{
+  background: #f0f8ff;
+  border-radius: 0.25rem;
+  border-bottom: 3px solid #0060A2;
+ 
+}
+
+.container-fluid {
+    max-width: 100%;
+} 
+.container {
+    max-width: 100% !important;
+}
+
+.sketch-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1em;
+}
+
+.note-skatch {
+ border: 1px solid black;
+}
+
+// .p5Canvas {
+//   cursor: url('../../../assets/images/pencil.png'), auto !important;
+// }
+
+#sketch-holder {
+  cursor: url('../../../../assets/images/pencil.png'), crosshair !important;
+}
+
+.col-4.smart-note {
+  position: absolute;
+  right: 0;
+  top: 152px;
+  background-color: #fff;
+  z-index: 9;
+  -webkit-box-shadow: 0px 3px 30px rgba(0, 0, 0, 0.12157);
+  box-shadow: 0px 3px 30px rgba(0, 0, 0, 0.12157);
+  height: 100vh;
+  overflow: overlay;
+  // padding: 15PX;
+  border: 1PX solid #00000026;
+}
+// .canvasContainer{
+//  cursor: url('../../../assets/images/pencil.png')0 30, default;
+// }
+.add-button {
+  height: auto!important;
+}
+.btn-group ul{
+  display: flex;
+}
+.btn-group li {
+  background-color: #0070c0;
+  padding: 10px 8px;
+  border-radius: 10px;
+  width: 100%;
+  border: none;
+  color: #fff;
+  width: 114px;
+  text-align: center;
+  margin-left: 12px;
+}
+
+.button {
+  cursor: pointer;
+}
+
+.btn-group li.red-bg{
+  background-color: #c00000;
+  }
+
+  #mydivheader {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: white; /* Ensure the header has a background color to cover content below it */
+    border-bottom: 1px solid #ccc; /* Optional: Add a border to separate the header from the content */
+    padding: 0px; /* Adjust padding as needed */
+}
+
+.content-container {
+    overflow-y: auto;
+    height: calc(100vh - 60px); /* Adjust height as needed to fit your layout */
+}
+
+.nav-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+}
+
+.nav-tabs li {
+  flex: 0 0 auto;
+}
+
+/* Custom scrollbar for webkit browsers (Chrome, Safari) */
+.nav-tabs::-webkit-scrollbar {
+  height: 8px; /* Horizontal scrollbar height */
+}
+
+.nav-tabs::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Track color */
+  border-radius: 10px; /* Rounded corners for the track */
+}
+
+.nav-tabs::-webkit-scrollbar-thumb {
+  background: #888; /* Scrollbar thumb color */
+  border-radius: 10px; /* Rounded corners for the thumb */
+}
+
+.nav-tabs::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Darker color on hover */
+}
+
+/* Custom scrollbar for Firefox */
+.nav-tabs {
+  scrollbar-width: thin; /* Thin scrollbar */
+  scrollbar-color: #888 #f1f1f1; /* Thumb and track color */
+}
+
+.general-Note {
+  border: 2px solid grey;
+  height: 107vh;
+  overflow-x: auto;
+}
+
+/* Prevent text selection during resizing */
+body {
+  user-select: none;
+}
+
+/* Optional: Change cursor during resizing operation */
+body.resizing {
+  cursor: ew-resize;
+}
+/* Main container using flexbox and preventing overflow */
+.resizable-container {
+    display: flex;
+    width: 100%;
+    height: 100%; /* Ensures it stretches full height */
+    overflow: hidden; /* Prevents content from overflowing */
+    position: relative;
+}
+
+/* Resizable divs that can stretch and shrink */
+.resizable {
+    flex: 1 1 auto; /* Allow divs to grow and shrink */
+    min-width: 150px; /* Prevent divs from becoming too small */
+    max-width: 100%; /* Ensure divs do not exceed container width */
+    overflow: hidden; /* Prevent content from overflowing within the div */
+    position: relative;
+}
+
+/* Resizer element styling */
+.resizer {
+    width: 20px;
+    height: 20px;
+    cursor: ew-resize;
+    // background-color: #da2828; /* Example color for visibility */
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0; /* Assuming vertical resizer on the right */
+}
+
+.reset-icon {
+  width: 20px;
+  height: 20px;
+  /* cursor: ew-resize; */
+  position: absolute;
+  /* top: 49px; */
+  bottom: 0;
+  right: 0;
+  top: 18px;
+  cursor: pointer;
+}
+
+.main-haeder-picker{
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #e1e1e13d;
+  border-bottom: 1px solid #ccc;
+  padding: 0px;
+  height: 47px;
+  display: flex !important;
+    justify-content: space-between !important;
+}
+.left-band {
+    margin-left: 13px;
+    display: flex;
+    align-items: center;
+}
+.left-band button.color-picker {
+    width: 17px !important;
+    height: 17px !important;
+    border: 0px;
+    border: 2px solid #fff;
+    box-shadow: 0px 4px 10px #0000001c;
+}
+.eraser-btn {
+    padding: 0;
+    margin-left: 15px;
+    display: flex;
+}
+.right-band {
+    display: flex;
+    align-items: center;
+    margin-right: 13px;
+}
+.chekbox-band {
+    float: right;
+    display: flex;
+    align-items: center;
+    background-color: white;
+    width: fit-content !important;
+    justify-content: center;
+    padding: 2px 8px;
+    border: 1px solid #eee;
+    border-radius: 7px;
+}
+.chekbox-band label {
+    margin: 0;
+    margin-right: 10px;
+}
+button#save-button {
+    padding-right: 0;
+    display: flex;
+}
+.main-haeder-picker .btn i {
+    font-size: 21px;
+    color: #181818ad;
+}
+
+ds-canvas-manager.canvses.ng-star-inserted {
+  display: block;
+  overflow-x: auto;
+  overflow-y: auto;
+  // max-height: 80vh;
+  width: 100%;
+  scrollbar-width: thin;
+}
+
+.default-pdf {
+  margin-bottom: -1px;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  padding: 8px 16px;
+}
+
+.canvas {
+  display: block;
+  overflow: auto;
+  // max-height: 75vh;
+  max-width: 31vw;
+  scrollbar-width: thin;
+}
+
+.selected-pen {
+  border: 2px solid gray!important;
+}

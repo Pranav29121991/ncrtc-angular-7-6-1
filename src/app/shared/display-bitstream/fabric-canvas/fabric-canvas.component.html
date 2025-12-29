@@ -1,0 +1,11 @@
+<div #scrollContainer [ngClass]="generalNote ? 'scroll-container1' : 'scroll-container'">
+  <div>
+    <button *ngIf="!isLoading" (click)="clearCanvas()">Clear Page</button>
+    <div class="spinner-border" role="status" *ngIf="!!isLoading">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <!-- <button *ngIf="!isFirst" (click)="deleteCanvas()">Delete Page</button> -->
+  </div>
+  <canvas #canvas [ngClass]="penColor === '#ffffff' ? 'eraser-cursor' : 'pencil-cursor'" style="border: 1px solid grey; margin-top: 5px;" id="{{canvasId}}" width="900"
+    height="1200"></canvas>
+</div>

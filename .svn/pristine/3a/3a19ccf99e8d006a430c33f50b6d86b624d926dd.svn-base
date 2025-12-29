@@ -1,0 +1,139 @@
+<div class="card" [@focusShadow]="(isCollapsed$ | async)?'blur':'focus'">
+    
+    <ds-truncatable [id]="dso.id">
+        <div class="position-absolute ml-1">
+            <ng-content></ng-content>
+        </div>
+        <!-- <a *ngIf="linkType != linkTypes.None" [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'" rel="noopener noreferrer" [routerLink]="[itemPageRoute]"
+         class="card-img-top full-width">
+          <div>
+              <ds-thumbnail [thumbnail]="dso?.thumbnail | async" [limitWidth]="false">
+              </ds-thumbnail>
+          </div>
+      </a> -->
+        <!-- <span *ngIf="linkType == linkTypes.None" class="card-img-top full-width">
+          <div>
+              <ds-thumbnail [thumbnail]="dso?.thumbnail | async" [limitWidth]="false">
+              </ds-thumbnail>
+          </div>
+      </span> -->
+        <div class="card-body">
+            <ds-type-badge *ngIf="showLabel" [object]="dso"></ds-type-badge>
+            <div class="mt-2" *ngIf="dso.firstMetadataValue('casefile.case.typename')">
+                <ds-truncatable-part [id]="dso.id" type="h4">
+                    <h4 class=" text-primary card-title"
+                        [innerHTML]="firstMetadataValue('casefile.case.typename')+'/'+firstMetadataValue('dc.title')+'/'+firstMetadataValue('casefile.case.registrationyear')">
+                        <!-- {{firstMetadataValue('casefile.case.typename')| translate}}/{{firstMetadataValue('dc.title') | translate}}{{firstMetadataValue('casefile.case.registrationyear')}} -->
+                    </h4>
+                </ds-truncatable-part>
+            </div>
+            <div class="mt-2" *ngIf="dso.firstMetadataValue('causelist.date')">
+                <ds-truncatable-part [id]="dso.id" type="h4">
+                    <h4 class=" text-primary card-title">
+                        {{firstMetadataValue('causelist.date') | translate | date: 'dd/MM/yyyy' }}
+                    </h4>
+                </ds-truncatable-part>
+            </div>
+            <div class="mt-2" *ngIf="dso.firstMetadataValue('causelist.bench.code') ">
+                <div>
+                    <h5 class="font-weight-bold">Bench Number</h5>
+                </div>
+                <span class="text-uppercase trim-info" data-toggle="tooltip" data-placement="top"
+                    title="{{dso.firstMetadataValue('causelist.bench.code')}}">{{dso.firstMetadataValue('causelist.bench.code')}}</span>
+            </div>
+            <div class="mb-1">
+                <div>
+                    <h5 class="font-weight-bold">Judge Name</h5>
+                </div>
+                <ng-container *ngIf="dso.allMetadata('casefile.judge.name') ">
+                    <span *ngFor="let judge of allMetadataValues('casefile.judge.name'); let last=last;">
+                        <a routerLink="/browse/JudgeName" [queryParams]="{value: judge}"><span
+                                class="text-uppercase text-muted trim-info" data-toggle="tooltip" data-placement="top"
+                                title="{{judge}}">{{judge }}</span></a> <br />
+                    </span>
+                </ng-container>
+            </div>
+            <div class="mt-2" *ngIf="dso.firstMetadataValue('casefile.petitioner.name')">
+                <div>
+                    <h5 class="font-weight-bold">Petitioner</h5>
+                </div>
+                <span class="text-uppercase trim-info" data-toggle="tooltip" data-placement="top"
+                    title="{{dso.firstMetadataValue('casefile.petitioner.name')}}">{{dso.firstMetadataValue('casefile.petitioner.name')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="dso.firstMetadataValue('casefile.respondent.name')">
+                <div>
+                    <h5 class="font-weight-bold">Respondent</h5>
+                </div>
+                <span class="text-uppercase trim-info" data-toggle="tooltip" data-placement="top"
+                    title="{{dso.firstMetadataValue('casefile.respondent.name')}}">{{dso.firstMetadataValue('casefile.respondent.name')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="dso.firstMetadataValue('casefile.advocate.petitioner')">
+                <div>
+                    <h5 class="font-weight-bold">Petitioner Advocate</h5>
+                </div>
+                <span class="text-uppercase trim-info" data-toggle="tooltip" data-placement="top"
+                    title="{{dso.allMetadataValues('casefile.advocate.petitioner')}}">{{dso.allMetadataValues('casefile.advocate.petitioner')}}</span>
+            </div>
+            <div class="mt-2" *ngIf="dso.firstMetadataValue('casefile.advocate.respondent') ">
+                <div>
+                    <h5 class="font-weight-bold">Respondent Advocate</h5>
+                </div>
+                <span class="text-uppercase trim-info" data-toggle="tooltip" data-placement="top"
+                    title="{{dso.allMetadataValues('casefile.advocate.respondent')}}">{{dso.allMetadataValues('casefile.advocate.respondent')}}</span>
+            </div>
+            <div *ngIf="linkType != linkTypes.None" class="text-center">
+                <a [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'" rel="noopener noreferrer"
+                    [routerLink]="[itemPageRoute]"  class="lead btn btn-primary viewButton">View</a>
+            </div>
+
+
+        </div>
+    </ds-truncatable>
+    <ng-content></ng-content>
+
+</div>
+  
+  <!-- <div class="card" [@focusShadow]="(isCollapsed$ | async)?'blur':'focus'">
+    <div class="position-absolute ml-1">
+        <ng-content></ng-content>
+    </div>
+    <a *ngIf="linkType != linkTypes.None" [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'" [attr.rel]="(linkType == linkTypes.ExternalLink) ? 'noopener noreferrer' : null" [routerLink]="[itemPageRoute]"
+        class="card-img-top full-width" [attr.title]="'search.results.view-result' | translate">
+        <div>
+              <ds-themed-thumbnail [thumbnail]="dso?.thumbnail | async" [limitWidth]="false">
+              </ds-themed-thumbnail>
+        </div>
+    </a>
+    <span *ngIf="linkType == linkTypes.None" class="card-img-top full-width">
+        <div>
+              <ds-themed-thumbnail [thumbnail]="dso?.thumbnail | async" [limitWidth]="false">
+              </ds-themed-thumbnail>
+        </div>
+    </span>
+    <div class="card-body">
+        <ds-themed-badges *ngIf="showLabel" [object]="dso" [context]="context" [showAccessStatus]="true"></ds-themed-badges>
+        <ds-truncatable [id]="dso.id">
+            <ds-truncatable-part [id]="dso.id" [minLines]="3" type="h4">
+                <h4 class="card-title" [innerHTML]="dsoTitle"></h4>
+            </ds-truncatable-part>
+            <ds-truncatable-part [id]="dso.id" [minLines]="1" *ngIf="dso.hasMetadata(['dc.contributor.author', 'dc.creator', 'dc.contributor.*'])">
+                <p class="item-authors card-text text-muted">
+                    <span *ngIf="dso.hasMetadata('dc.date.issued')" class="item-date">{{firstMetadataValue('dc.date.issued')}}</span>
+                    <span *ngFor="let author of allMetadataValues(['dc.contributor.author', 'dc.creator', 'dc.contributor.*']);">,
+                        <span [innerHTML]="author"></span>
+                    </span>
+                </p>
+            </ds-truncatable-part>
+            <ds-truncatable-part *ngIf="dso.hasMetadata('dc.description.abstract')" [id]="dso.id" [minLines]="3">
+                <p class="item-abstract card-text">
+                    <span [innerHTML]="firstMetadataValue('dc.description.abstract')"></span>
+                </p>
+            </ds-truncatable-part>
+        </ds-truncatable>
+        <div *ngIf="linkType != linkTypes.None" class="text-center">
+            <a [target]="(linkType == linkTypes.ExternalLink) ? '_blank' : '_self'" [attr.rel]="(linkType == linkTypes.ExternalLink) ? 'noopener noreferrer' : null" [routerLink]="[itemPageRoute]"
+                class="lead btn btn-primary viewButton">{{ 'search.results.view-result' | translate}}</a>
+        </div>
+    </div>
+    <ng-content></ng-content>
+  </div> -->

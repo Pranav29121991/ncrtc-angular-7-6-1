@@ -1,0 +1,72 @@
+<div class="container">
+  <div class="epeople-registry row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between border-bottom mb-3">
+        <h2 id="header" class="pb-2">Document Type Registry</h2>
+
+        <div *ngIf="!isDocumentTypeFormShown">
+          <button class="mr-auto btn btn-success addEPerson-button"
+                  (click)="isDocumentTypeFormShown = true">
+            <i class="fas fa-plus"></i>
+            <span class="d-none d-sm-inline">Add Document Type</span>
+          </button>
+        </div>
+      </div>
+
+      <ds-documenttype-form *ngIf="isDocumentTypeFormShown" (submitForm)="reset()"
+                       (cancelForm)="isDocumentTypeFormShown = false"></ds-documenttype-form>
+
+      <div *ngIf="!isDocumentTypeFormShown">
+       
+        <ds-pagination
+        *ngIf="(documentType | async)?.payload?.totalElements > 0"
+        [paginationOptions]="pageConfig"
+        [pageInfoState]="(documentType | async)?.payload"
+        [collectionSize]="(documentType | async)?.payload?.totalElements"
+        [hideGear]="true"
+        [hidePagerWhenSinglePage]="true">
+
+          <div class="table-responsive">
+            <table id="epeople" class="table table-striped table-hover table-bordered">
+              <thead>
+              <tr>
+                <th scope="col">{{labelPrefix + 'table.id' | translate}}</th>
+                <th scope="col">{{labelPrefix + 'table.name' | translate}}</th>
+               
+                <th>{{labelPrefix + 'table.edit' | translate}}</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let epersonDto of (documentType | async)?.payload?.page"
+                  [ngClass]="{'table-primary' : isActive(epersonDto) | async}">
+                <td>{{epersonDto.id}}</td>
+                <td>{{epersonDto.name}}</td>
+               
+                <td>
+                  <div class="btn-group edit-field">
+                    <button class="delete-button" (click)="toggleEditDocumentType(epersonDto)"
+                            class="btn btn-outline-primary btn-sm access-control-editEPersonButton"
+                            title="{{labelPrefix + 'table.edit.buttons.edit' | translate: {name: epersonDto.documenttypename} }}">
+                      <i class="fas fa-edit fa-fw"></i>
+                    </button>
+                    <button (click)="deleteDocumentType(epersonDto)"
+                            class="btn btn-outline-danger btn-sm access-control-deleteEPersonButton"
+                            title="{{labelPrefix + 'table.edit.buttons.remove' | translate: {name: epersonDto.documenttypename} }}">
+                      <i class="fas fa-trash-alt fa-fw"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </ds-pagination>
+
+        <div *ngIf="(documentType | async)?.payload?.totalElements == 0"  class="alert alert-info w-100 mb-2" role="alert">
+          {{labelPrefix + 'no-items' | translate}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
